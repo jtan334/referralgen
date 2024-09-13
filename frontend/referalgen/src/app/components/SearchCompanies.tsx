@@ -1,12 +1,14 @@
 import React from 'react'
-import styles from './SearchCompanies.module.css'
 
 
 const ReferalCard = () => {
     return (
-        <div className = {styles.searchConatiner}>
-            <h1 className='text-xl hover:bg-sky-500 text-[#3E6259]'>Search Companies</h1>
-            <input type="text" placeholder="Type here" className="input input-bordered w-full max-w-x  focus: " />
+        <div className = "outline my-10 mx-10 py-5 px-5">
+            <h1 className='text-2xl text-[#3E6259] font'>Search Companies</h1>
+            <div className ="flex">
+            <input type="text" placeholder="Type here" className="input input-bordered w-full max-w-x  focus:ring-0 focus:border bg-white text-gray text-xl" />
+            <button className="btn btn-outline ml-3 outline-sage text-gray text-xl hover:bg-ymblue hover:text-white "> Search</button>
+            </div>
         </div>
     )
 }
