@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 const Landing = () => {
@@ -13,16 +14,19 @@ const Landing = () => {
               Save money using referral links. <br />
               <br /> Make money sharing them.
             </p>
-            <button className="btn btn-primary text-lg bg-saffron outline-none">
+            <Link href ="#info"  scroll={true}>
+            <button className="btn btn-primary text-lg bg-saffron outline-none hover:bg-ymblue hover:text-white">
               <p>How It Works</p>
             </button>
+            </Link>
+          
           </div>
         </div>
       </div>
 
 
 
-      <div className="flex w-full justify-center py-11 px-11">
+      <div id = "info" className="flex w-full justify-center py-11 px-11">
   <div className="flex items-center justify-between w-full max-w-6xl">
     <div className="card bg-ymblue rounded-box grid h-32 w-full md:w-1/2 flex-grow place-items-center text-white text-xl md:text-2xl lg:text-3xl mx-5 p-5">
       Generate Referral Links
@@ -58,9 +62,12 @@ const Landing = () => {
 </div>
 
 <div className="flex justify-center py-8">
-<button className="btn btn-primary text-lg bg-saffron outline-none px-9">
+ <Link href={`/signup`}>
+ <button className="btn btn-primary text-lg bg-saffron outline-none px-9 hover:bg-ymblue hover:text-white">
               <p>Sign Up</p>
     </button>
+
+ </Link> 
 
 </div>
 

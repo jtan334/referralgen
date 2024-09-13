@@ -25,6 +25,7 @@ body {
     )
     rgb(var(--background-start-rgb));
   margin:0;
+  scroll-behavior: smooth;
   }
 
 .background-animate {
