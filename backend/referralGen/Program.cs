@@ -2,6 +2,12 @@ using System.Reflection;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<MySqlRepo>(provider =>
+    new MySqlRepo(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddControllers();
+
     
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -10,6 +16,9 @@ builder.Services.AddSwaggerGen(c =>
 });
     
 var app = builder.Build();
+
+app.UseAuthorization();
+app.MapControllers();
     
 if (app.Environment.IsDevelopment())
 {
