@@ -1,4 +1,4 @@
-namespace referralGen {
+namespace referralGen.models {
 
     public class Users{
 
@@ -6,7 +6,7 @@ namespace referralGen {
 
         required public string Name {get; set;}
 
-        required public List <Link> Links {get; set;}
+        required public List <String> Links {get; set;}
 
 
 

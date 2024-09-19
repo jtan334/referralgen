@@ -1,4 +1,4 @@
-namespace referralGen
+namespace referralGen.models
 {
  public class Company
  {
