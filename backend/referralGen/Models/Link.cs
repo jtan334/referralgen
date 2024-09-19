@@ -10,12 +10,14 @@ public class Link
 
    required  public string CompanyName {get;set;}
 
+   required public string ProductName{get;set;}
+
    required  public string Country {get;set;}
 
 
    required  public string RefLink {get; set;}
 
-    public Boolean Active {get;set;}
+    public bool Active {get;set;}
 
    required  public string Owner {get; set;}
 
