@@ -2,6 +2,8 @@ using System.Reflection;
 using Microsoft.OpenApi.Models;
 using referralGen.SQLRepo; 
 using dotenv.net;
+using referralGen.models;
+using System.Drawing.Printing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,7 @@ string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings_
 builder.Services.AddSingleton(new DatabaseConnection(connectionString));
 
 builder.Services.AddTransient<UsersRepo>();
+builder.Services.AddTransient<CompanyRepo>();
 builder.Services.AddTransient<LinkRepo>();
 
 
@@ -57,10 +60,52 @@ app.MapGet("/users/links/{userId}", async (string userId, UsersRepo usersRepo) =
     return links != null ? Results.Ok(links) : Results.NotFound();
 });
 
-app.MapGet("/links/{company}", async (string company, LinkRepo linkRepo) =>
+app.MapGet("/company/{company}", async (string company, CompanyRepo companyRepo) =>
 {
-    var links = await linkRepo.GetCompanyLinks(company);
+    var links = await companyRepo.GetCompanyLinks(company);
     return links != null ? Results.Ok(links) : Results.NotFound();
+});
+
+app.MapPost ("/links/new", async (Link link, LinkRepo linkRepo) =>
+{
+    var res = await linkRepo.AddNewLink(link);
+
+    if (res != null){
+         if (res == "The RefLink is not unique") {
+            Console.WriteLine("reaches the if");
+            return Results.BadRequest(res);
+        }
+        else{
+            Console.WriteLine("reached the else");
+            return Results.Ok(res);
+        }
+    }
+    else {
+        return Results.NotFound(new { Message = "Link creation failed." });
+    }
+});
+
+app.MapPut("/links/edit", async (Link link, LinkRepo linkRepo) =>
+{
+    // Call the EditLink method to update the link
+    var result = await linkRepo.EditLink(link);
+
+    // Check the result and return appropriate HTTP response
+    if (result == "Link updated successfully.")
+    {
+        // If the link was successfully updated, return 200 OK
+        return Results.Ok(new { Message = result });
+    }
+    else if (result == "The link does not exist.")
+    {
+        // If the link does not exist, return 404 Not Found
+        return Results.NotFound(new { Message = result });
+    }
+    else
+    {
+        // For any other case, return a 400 Bad Request with the result message
+        return Results.BadRequest(new { Message = result });
+    }
 });
 
 

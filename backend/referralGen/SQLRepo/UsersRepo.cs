@@ -23,5 +23,7 @@ namespace referralGen.SQLRepo
                 return links.ToList();
             }
         }
+
+       
     }
 }
