@@ -17,7 +17,7 @@ namespace referralGen.SQLRepo
             return links.ToList();
         }
 
-        public async Task <Users> CreateNewUser(Users newUser)
+        public async Task <string> CreateNewUser(Users newUser)
         {
             using var connection = _dbConnection.CreateConnection();
            
@@ -28,8 +28,13 @@ namespace referralGen.SQLRepo
             var createNewUser = await connection.QuerySingleOrDefaultAsync<Users>(sql, new 
             { UID = newUser.UID, 
             Name=newUser.Name});
-
-            return  createNewUser;
+            if (createNewUser != null){
+                return  createNewUser.ToString();
+            }
+            else{
+                return "Error creating new user";
+            }
+            
         }
 
         public async Task<string> DeleteUser (string Uid)
