@@ -1,15 +1,11 @@
-using System.Reflection;
 using Microsoft.OpenApi.Models;
 using referralGen.SQLRepo; 
 using dotenv.net;
 using referralGen.models;
-using System.Drawing.Printing;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-DotEnv.Load(options: new DotEnvOptions(envFilePaths: new[] { ".env" }));
-
+DotEnv.Load(options: new DotEnvOptions(envFilePaths: [".env"]));
 
 
 
@@ -33,8 +29,6 @@ builder.Services.AddTransient<LinkRepo>();
 
 
 builder.Services.AddEndpointsApiExplorer();
-
-
 
     
 var app = builder.Build();
@@ -60,7 +54,7 @@ app.MapGet("/users/links/{userId}", async (string userId, UsersRepo usersRepo) =
     return links != null ? Results.Ok(links) : Results.NotFound();
 });
 
-app.MapGet("/company/{company}", async (string company, CompanyRepo companyRepo) =>
+app.MapGet("/company/links/{company}", async (string company, CompanyRepo companyRepo) =>
 {
     var links = await companyRepo.GetCompanyLinks(company);
     return links != null ? Results.Ok(links) : Results.NotFound();
@@ -107,6 +101,81 @@ app.MapPut("/links/edit", async (Link link, LinkRepo linkRepo) =>
         return Results.BadRequest(new { Message = result });
     }
 });
+
+app.MapDelete( "/links/delete/{Id}", async(LinkRepo linkRepo, int Id)=>
+{
+ try
+    {
+        var result = await linkRepo.DeleteLink(Id);
+        return Results.Ok(result);
+    }
+
+    catch (Exception ex)
+    {
+        // For all other errors, return a 400 Bad Request
+        return Results.BadRequest(ex);
+    }
+
+});
+
+app.MapPut ("links/edit/activate", async(LinkRepo linkRepo, int id) =>
+{
+    try{
+        var result = await linkRepo.ActivateLink(id);
+        return Results.Ok(result);
+    }
+    catch(Exception ex)
+    {
+        return Results.BadRequest(ex);
+    }
+});
+
+app.MapPost ("company/add", async(CompanyRepo companyRepo, Company company)=>
+{
+       var res = await companyRepo.AddCompany(company);
+
+    if (res != null){
+         if (res == "The company and product name is not unique") {
+            return Results.BadRequest(res);
+        }
+        else{
+            return Results.Ok(res);
+        }
+    }
+    else {
+        return Results.NotFound(new { Message = "Company creation failed." });
+    }
+});
+
+app.MapPost("users/add", async(UsersRepo usersRepo, Users user)=>
+{
+
+    var res = await usersRepo.CreateNewUser(user);
+
+    if (res != null){
+        
+            return Results.Ok(res);
+    }
+    else {
+        return Results.BadRequest(new { Message = "User creation failed." });
+    }
+});
+
+app.MapPost("users/delete/{userId}", async(UsersRepo usersRepo, string userId) =>
+{
+    var res = await usersRepo.DeleteUser(userId);
+
+    if (res != null){
+        
+            return Results.Ok(res);
+    }
+    else {
+        return Results.BadRequest(new { Message = "User deletion failed." });
+    }
+});
+
+
+
 
 
 

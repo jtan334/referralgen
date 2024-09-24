@@ -3,29 +3,23 @@ using Dapper;
 
 namespace referralGen.SQLRepo;
 
-public class LinkRepo
+public class LinkRepo(DatabaseConnection dbConnection)
 {
 
 
-    private readonly DatabaseConnection _dbConnection;
-
-    public LinkRepo(DatabaseConnection dbConnection)
-    {
-        _dbConnection = dbConnection;
-    }
+    private readonly DatabaseConnection _dbConnection = dbConnection;
 
     public async Task<string> AddNewLink(Link newLink)
     {
-        using (var connection = _dbConnection.CreateConnection())
-        {
+        using var connection = _dbConnection.CreateConnection();
 
-            string checkSql = "SELECT COUNT(*) FROM links WHERE RefLink = @RefLink;";
-            
+        string checkSql = "SELECT COUNT(*) FROM links WHERE RefLink = @RefLink;";
 
-             var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { RefLink = newLink.RefLink });
+
+        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { RefLink = newLink.RefLink });
 
         if (exists > 0)
-        {   
+        {
             return "The RefLink is not unique.";
         }
 
@@ -35,41 +29,37 @@ public class LinkRepo
 
             SELECT * FROM links WHERE UID = LAST_INSERT_ID();"; // MySQL
 
-            var createdLink = await connection.QuerySingleAsync<Link>(sql, new
-            {
-                RefLink = newLink.RefLink,
-                Owner = newLink.Owner,
-                Used = newLink.Used,
-                Seen = newLink.Seen,
-                CompanyName = newLink.CompanyName,
-                ProductName = newLink.ProductName,
-                Country = newLink.Country,
-                Active = newLink.Active
-            });
+        var createdLink = await connection.QuerySingleAsync<Link>(sql, new
+        {
+            RefLink = newLink.RefLink,
+            Owner = newLink.Owner,
+            Used = newLink.Used,
+            Seen = newLink.Seen,
+            CompanyName = newLink.CompanyName,
+            ProductName = newLink.ProductName,
+            Country = newLink.Country,
+            Active = newLink.Active
+        });
 
-            return $"Link created successfully: {createdLink.RefLink}";
-        }
+        return $"Link created successfully: {createdLink.RefLink}";
     }
 
-     public async Task<List<Link>> GetLink(string UID)
+     public async Task<List<Link>> GetLink(int UID)
         {
-            using (var connection = _dbConnection.CreateConnection())
-            {
+        using var connection = _dbConnection.CreateConnection();
 
-                string sql = "SELECT * FROM links WHERE UID = @UID";
-                var links = await connection.QueryAsync<Link>(sql, new { UID = UID });
-                
-                return links.ToList();
-            }
-        }
+        string sql = "SELECT * FROM links WHERE UID = @UID";
+        var links = await connection.QueryAsync<Link>(sql, new { UID = UID });
+
+        return links.ToList();
+    }
 
  public async Task<string> EditLink(Link link)
 {
-    using (var connection = _dbConnection.CreateConnection())
-    {
+        using var connection = _dbConnection.CreateConnection();
         // Check if the link exists
         string checkSql = "SELECT COUNT(*) FROM links WHERE UID = @UID;";
-        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { UID = link.UID });
+        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { link.UID });
 
         if (exists == 0)
         {
@@ -99,7 +89,7 @@ public class LinkRepo
             ProductName = link.ProductName,
             Country = link.Country,
             Active = link.Active,
-            UID = link.UID // Make sure to include UID in the update condition
+            UID = link.UID 
         });
 
         // Check if any rows were updated
@@ -112,7 +102,45 @@ public class LinkRepo
             return "No changes were made to the link.";
         }
     }
-}
+ public async Task<string> DeleteLink(int UID)
+    {
+        using var connection = _dbConnection.CreateConnection();
+        var deleteQuery = "DELETE FROM links WHERE UID = @Uid";
+
+        try
+        {
+            var rowsAffected = await connection.ExecuteAsync(deleteQuery, new { Uid = UID });
+
+            if (rowsAffected == 0)
+            {
+                return $"Link ID: {UID} Not Found";
+            }
+            return $"Successfully deleted link {UID}";
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while deleting the link.", ex);
+        }
+    }
+    
+
+    public async Task <string> ActivateLink (int UID){
+
+         using var connection = _dbConnection.CreateConnection();
+         var activateQuery = "UPDATE links SET active = 1 WHERE UID =@UID";
+
+        try{
+            var activateLink = await connection.ExecuteAsync(activateQuery, new { UID });
+            return $"Successfully activated {UID}";
+        }
+         catch (Exception ex)
+        {
+            throw new Exception("An error occurred while activating the link.", ex);
+        }
+
+    }
+
+
 
 
 
