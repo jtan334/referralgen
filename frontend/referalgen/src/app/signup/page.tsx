@@ -1,55 +1,37 @@
-"use client"; // This indicates that this component is a client component
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Use next/navigation for the router
-import { auth, provider } from '../firebase/Firebase';
-import {
-  signInWithRedirect,
-  getRedirectResult,
-  User,
-} from 'firebase/auth';
+"use client";
+import React, { useEffect, useState } from "react";
+import SignInButton from "./SignInButton";
+import { auth } from "../firebase/Firebase";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
 
-// Component: SignUp
-const SignUp: React.FC = () => {
+function Page() {
   const router = useRouter();
-  const [isUserSignedIn, setIsUserSignedIn] = useState(false); // State to manage user sign-in
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkSignInResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          const user: User | null = result.user;
-          if (user) {
-            console.log('User signed in:', user);
-            setIsUserSignedIn(true); // Update state if user is signed in
-            router.push('/dashboard'); // Redirect to dashboard
-          }
-        }
-      } catch (error) {
-        console.error('Sign-in error:', error);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setLoading(false);
+      if (currentUser) {
+        console.log("User is logged in:", currentUser);
+        router.push('/dashboard'); // Redirect to dashboard if user is signed in
       }
-    };
+    });
 
-    checkSignInResult();
+    return () => unsubscribe(); // Cleanup the listener on unmount
   }, [router]);
 
-  // Function to handle sign-in button click
-  const handleSignIn = () => {
-    signInWithRedirect(auth, provider);
-  };
+  if (loading) {
+    return <div>Loading...</div>; // Optional loading indicator
+  }
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h2>Sign In with Google</h2>
-      <button
-        onClick={handleSignIn}
-        style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
-      >
-        Sign In
-      </button>
-      {isUserSignedIn && <p>User is signed in!</p>} {/* Optional message for user feedback */}
+    <div>
+      
+        <SignInButton /> 
+      
     </div>
   );
-};
+}
 
-export default SignUp;
+export default Page;
