@@ -67,6 +67,13 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify(newUser),
     });
+    const response = await fetch(`${apiUrl}/users/add`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newUser),
+    });
 
     if (!response.ok) {
       throw new Error(`Failed to create user: ${response.statusText}`);
