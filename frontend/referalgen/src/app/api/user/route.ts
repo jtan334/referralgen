@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 
 interface Link {
   UID: number;
@@ -17,97 +17,100 @@ interface User {
   name: string;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL;
+const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL; // Place this outside the handlers if it's shared
 
-  switch (req.method) {
-    // GET: Retrieve user links by user ID
-    case 'GET':
-      try {
-        
-        const userId = req.query.userId as string;
-        
-        if (!userId) {
-          return res.status(400).json({ message: 'User ID is required' });
-        }
+// GET: Retrieve user links by user ID
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const userId = url.searchParams.get('userId');
 
-        const response = await fetch(`${apiUrl}/users/links/${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+  if (!userId) {
+    return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
+  }
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch links: ${response.statusText}`);
-        }
+  try {
+    const response = await fetch(`${apiUrl}/users/links/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-        const links: Link[] = await response.json();
-        res.status(200).json(links);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error fetching user links', error: (error as Error).message });
-      }
-      break;
+    if (!response.ok) {
+      throw new Error(`Failed to fetch links: ${response.statusText}`);
+    }
 
-    // POST: Create a new user
-    case 'POST':
-      try {
-        const newUser: User = req.body;
+    const links: Link[] = await response.json();
+    return NextResponse.json(links, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: 'Error fetching user links', error: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
 
-        if (!newUser.UID || !newUser.name) {
-          return res.status(400).json({ message: 'User UID and name are required' });
-        }
+// POST: Create a new user
+export async function POST(request: Request) {
+  try {
+    const newUser: User = await request.json();
 
-        const response = await fetch(`${apiUrl}/users/add`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newUser),
-        });
+    if (!newUser.UID || !newUser.name) {
+      return NextResponse.json({ message: 'User UID and name are required' }, { status: 400 });
+    }
 
-        if (!response.ok) {
-          throw new Error(`Failed to create user: ${response.statusText}`);
-        }
+    const response = await fetch(`${apiUrl}/users/add`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newUser),
+    });
 
-        const createdUser = await response.json();
-        res.status(201).json(createdUser);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error creating user', error: (error as Error).message });
-      }
-      break;
+    if (!response.ok) {
+      throw new Error(`Failed to create user: ${response.statusText}`);
+    }
 
-    // DELETE: Delete a user by user ID
-    case 'DELETE':
-      try {
-        const userId = req.query.userId as string;
-        if (!userId) {
-          return res.status(400).json({ message: 'User ID is required' });
-        }
+    const createdUser = await response.json();
+    return NextResponse.json(createdUser, { status: 201 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: 'Error creating user', error: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
 
-        const response = await fetch(`${apiUrl}/users/delete/${userId}`, {
-          method: 'POST', // As per your backend's DELETE method
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+// DELETE: Delete a user by user ID
+export async function DELETE(request: Request) {
+  const url = new URL(request.url);
+  const userId = url.searchParams.get('userId');
 
-        if (!response.ok) {
-          throw new Error(`Failed to delete user: ${response.statusText}`);
-        }
+  if (!userId) {
+    return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
+  }
 
-        const result = await response.json();
-        res.status(200).json({ message: `User ${userId} deleted`, result });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error deleting user', error: (error as Error).message });
-      }
-      break;
+  try {
+    const response = await fetch(`${apiUrl}/users/delete/${userId}`, {
+      method: 'POST', // Assuming your backend uses POST for delete
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-    default:
-      res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
-      res.status(405).end(`Method ${req.method} Not Allowed`);
+    if (!response.ok) {
+      throw new Error(`Failed to delete user: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return NextResponse.json({ message: `User ${userId} deleted`, result }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: 'Error deleting user', error: (error as Error).message },
+      { status: 500 }
+    );
   }
 }

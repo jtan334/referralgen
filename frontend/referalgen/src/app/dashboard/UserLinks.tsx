@@ -22,30 +22,31 @@ const UserLinks: React.FC = () => {
 
   // Fetch the user links (replace with actual API endpoint)
   useEffect(() => {
-    
     const fetchLinks = async () => {
       try {
-        
-        const response = fetchUserLinks("Test"); 
-        const data =  await response;
-        setLinks(data);
+        // Await the result of fetchUserLinks directly
+        const data = await fetchUserLinks("Test"); 
+        setLinks(data); // Assuming data is in the expected format
       } catch (error) {
         console.error('Error fetching links:', error);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchLinks();
   }, []);
 
   const fetchUserLinks = async (userId: string) => {
-    
     const response = await fetch(`/api/user/?userId=${userId}`);
     
-    if (!response.ok) throw new Error('Failed to fetch user links');
-    return await response.json();
+    if (!response.ok) {
+      throw new Error('Failed to fetch user links');
+    }
+  
+    return response.json(); // No need for an additional await here
   };
+  
 
 // Example for activating a link
 const deleteLink = async (linkId: number) => {
