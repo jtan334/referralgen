@@ -3,8 +3,10 @@ import React, { useState } from 'react'
 import SearchCompanies from '../components/SearchCompanies'
 import UserLinks from './UserLinks'
 
-const ServiceSelector = () => {
 
+
+
+const ServiceSelector = () => {
     const [selectedHeading, setSelectedHeading] = useState<string | null>(null);
 
     const renderContent = () => {
@@ -20,7 +22,8 @@ const ServiceSelector = () => {
 
     return (
         <div className="flex flex-col items-center justify-start w-full h-auto p-4">
-            <div className="flex items-center space-x-5 w-[80%]"> {/* Adjust the width here */}
+            {/* Centered Tabs */}
+            <div className="flex items-center justify-center space-x-5 w-[80%]"> {/* Use justify-center here */}
                 <span
                     className={`cursor-pointer text-2xl font-bold ${
                         selectedHeading === 'Generate Links' ? 'text-cerulean' : 'text-ymblue'

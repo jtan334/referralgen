@@ -30,11 +30,23 @@ builder.Services.AddTransient<LinkRepo>();
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
     
 var app = builder.Build();
 
 app.UseAuthorization();
 app.MapControllers();
+app.UseCors("AllowAllOrigins");
     
 if (app.Environment.IsDevelopment())
 {
@@ -46,7 +58,6 @@ if (app.Environment.IsDevelopment())
 }
 
     
-app.MapGet("/", () => "Hello World!");
 
 app.MapGet("/users/links/{userId}", async (string userId, UsersRepo usersRepo) =>
 {
@@ -161,7 +172,7 @@ app.MapPost("users/add", async(UsersRepo usersRepo, Users user)=>
     }
 });
 
-app.MapPost("users/delete/{userId}", async(UsersRepo usersRepo, string userId) =>
+app.MapDelete("users/delete/{userId}", async(UsersRepo usersRepo, string userId) =>
 {
     var res = await usersRepo.DeleteUser(userId);
 

@@ -3,11 +3,15 @@
 import React, { useState, useEffect } from 'react';
 
 // Define the type for each link
+
 interface Link {
-  id: number;
+  UID: number;
+  owner: string;
   companyName: string;
   productName: string;
-  url: string;
+  country: string;
+  active: boolean;
+  refLink: string;
   seen: number;
   used: number;
 }
@@ -18,10 +22,12 @@ const UserLinks: React.FC = () => {
 
   // Fetch the user links (replace with actual API endpoint)
   useEffect(() => {
+    
     const fetchLinks = async () => {
       try {
-        const response = await fetch('/api/user-links'); // Replace with your actual API route
-        const data = await response.json();
+        
+        const response = fetchUserLinks("Test"); 
+        const data =  await response;
         setLinks(data);
       } catch (error) {
         console.error('Error fetching links:', error);
@@ -33,17 +39,64 @@ const UserLinks: React.FC = () => {
     fetchLinks();
   }, []);
 
-  // Edit link handler
-  const handleEdit = (linkId: number) => {
-    console.log(`Edit link with ID: ${linkId}`);
-    // Implement the logic to edit the link
+  const fetchUserLinks = async (userId: string) => {
+    
+    const response = await fetch(`/api/user/?userId=${userId}`);
+    
+    if (!response.ok) throw new Error('Failed to fetch user links');
+    return await response.json();
   };
 
-  // Delete link handler
-  const handleDelete = (linkId: number) => {
-    console.log(`Delete link with ID: ${linkId}`);
-    // Implement the logic to delete the link
-  };
+// Example for activating a link
+const deleteLink = async (linkId: number) => {
+  const response = await fetch(`/api/links/delete`, {
+    method: 'Delete',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id: linkId }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to activate link');
+  }
+  const data = await response.json();
+  return data;
+};
+
+const activateLink = async (linkId: number) => {
+  const response = await fetch(`/api/links?editType=activate`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id: linkId }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to activate link');
+  }
+  const data = await response.json();
+  return data;
+};
+
+
+// Example for editing a link
+const editLink = async (updatedLink: Link) => {
+  const response = await fetch(`/api/links`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedLink),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update link');
+  }
+  const data = await response.json();
+  return data;
+};
 
   if (loading) {
     return <div>Loading...</div>;
@@ -65,19 +118,19 @@ const UserLinks: React.FC = () => {
           </thead>
           <tbody>
             {links.map((link) => (
-              <tr key={link.id}>
+              <tr key={link.UID}>
                 <td>{link.companyName}</td>
                 <td>{link.productName}</td>
                 <td>
-                  <a href={link.url} target="_blank" rel="noopener noreferrer">
-                    {link.url}
+                  <a href={link.refLink} target="_blank" rel="noopener noreferrer">
+                    {link.refLink}
                   </a>
                 </td>
                 <td>{link.seen}</td>
                 <td>{link.used}</td>
                 <td>
-                  <button onClick={() => handleEdit(link.id)}>Edit</button>
-                  <button onClick={() => handleDelete(link.id)}>Delete</button>
+                  <button onClick={() => editLink(link)}>Edit</button>
+                  <button onClick={() => deleteLink(link.UID)}>Delete</button>
                 </td>
               </tr>
             ))}

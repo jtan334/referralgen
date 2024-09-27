@@ -1,6 +1,7 @@
 'use client'
 import React from 'react';
 
+
 const SearchCompanies = () => {
   return (
     <div className="outline my-10 mx-10 py-5 px-5">
