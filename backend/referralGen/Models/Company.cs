@@ -2,6 +2,7 @@ namespace referralGen.models
 {
  public class Company
  {
+   required public int IdCompanies {get;set;}
     required public string CompanyName {get;set;}
 
     required public string ProductName {get;set;}

@@ -1,121 +1,156 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 
+// Define the Link interface
 interface Link {
-    UID: number;
-    owner: string;
-    companyName: string;
-    productName: string;
-    country: string;
-    active: boolean;
-    refLink: string;
-    seen: number;
-    used: number;
+  UID: string;
+  owner: string;
+  companyName: string;
+  productName: string;
+  country: string;
+  active: boolean;
+  refLink: string;
+  seen: number;
+  used: number;
+}
+
+// GET request handler
+export async function GET(req: Request) {
+  const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL;
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get('userId');
+
+  if (!userId) {
+    return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
   }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const response = await fetch(`${apiUrl}/users/links/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch user links');
+    }
+
+    const data: Link[] = await response.json();
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Failed to fetch user links', error: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
+
+// POST request handler
+export async function POST(req: Request) {
   const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL;
 
-  switch (req.method) {
-    case 'GET':
-      try {
-        const userId = req.query.userId as string;
-        const response = await fetch(`${apiUrl}/users/links/${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+  try {
+    const newLink: Link = await req.json(); // Parse request body
+    const response = await fetch(`${apiUrl}/links/new`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newLink),
+    });
 
-        if (!response.ok) throw new Error('Failed to fetch user links');
-        const data: Link[] = await response.json();
-        res.status(200).json(data);
-      } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch user links', error: error });
+    if (!response.ok) {
+      throw new Error('Failed to create link');
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: 201 });
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Failed to create link', error: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT request handler
+export async function PUT(req: Request) {
+  const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL;
+  const { searchParams } = new URL(req.url);
+  const editType = searchParams.get('editType');
+
+  try {
+    const body = await req.json();
+
+    if (editType === 'activate') {
+      const linkId = body.id;
+      const response = await fetch(`${apiUrl}/links/edit/activate`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: linkId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to activate link');
       }
-      break;
 
-    case 'POST':
-      try {
-        const newLink: Link = req.body;
-        const response = await fetch(`${apiUrl}/links/new`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newLink),
-        });
+      const data = await response.json();
+      return NextResponse.json(data, { status: 200 });
+    } else {
+      const updatedLink: Link = body;
+      const response = await fetch(`${apiUrl}/links/edit`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedLink),
+      });
 
-        if (!response.ok) throw new Error('Failed to create link');
-        const data = await response.json();
-        res.status(201).json(data);
-      } catch (error) {
-        res.status(500).json({ message: 'Failed to create link', error: error  });
+      if (!response.ok) {
+        throw new Error('Failed to update link');
       }
-      break;
 
-    case 'PUT':
-      const editType = req.query.editType;
+      const data = await response.json();
+      return NextResponse.json(data, { status: 200 });
+    }
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Failed to update link', error: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
 
-      if (editType === 'activate') {
-        // PUT for links/edit/activate
-        try {
-          const linkId = req.body.id;  // Assuming the request body contains the link id to activate
-          const response = await fetch(`${apiUrl}/links/edit/activate`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id: linkId }),
-          });
+// DELETE request handler
+export async function DELETE(req: Request) {
+  const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL;
+  const { searchParams } = new URL(req.url);
+  const linkId = searchParams.get('id');
 
-          if (!response.ok) throw new Error('Failed to activate link');
-          const data = await response.json();
-          res.status(200).json(data);
-        } catch (error) {
-          res.status(500).json({ message: 'Failed to activate link', error:  error});
-        }
+  if (!linkId) {
+    return NextResponse.json({ message: 'Link ID is required' }, { status: 400 });
+  }
 
-      } else {
-        // PUT for links/edit
-        try {
-          const updatedLink: Link = req.body;
-          const response = await fetch(`${apiUrl}/links/edit`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedLink),
-          });
+  try {
+    const response = await fetch(`${apiUrl}/links/delete/${linkId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-          if (!response.ok) throw new Error('Failed to update link');
-          const data = await response.json();
-          res.status(200).json(data);
-        } catch (error) {
-          res.status(500).json({ message: 'Failed to update link', error:  error});
-        }
-      }
-      break;
+    if (!response.ok) {
+      throw new Error('Failed to delete link');
+    }
 
-    case 'DELETE':
-      try {
-        const linkId = req.query.id as string;
-        const response = await fetch(`${apiUrl}/links/delete/${linkId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) throw new Error('Failed to delete link');
-        const data = await response.json();
-        res.status(200).json(data);
-      } catch (error) {
-        res.status(500).json({ message: 'Failed to delete link', error: error });
-      }
-      break;
-
-    default:
-      res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
-      res.status(405).end(`Method ${req.method} Not Allowed`);
+    const data = await response.json();
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Failed to delete link', error: (error as Error).message },
+      { status: 500 }
+    );
   }
 }

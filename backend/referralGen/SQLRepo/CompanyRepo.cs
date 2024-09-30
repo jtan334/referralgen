@@ -15,36 +15,62 @@ public class CompanyRepo
         }
 
 
-    public async Task<string> AddCompany (Company newCompany)
+   public async Task<string> AddCompany(Company newCompany)
+{
+    using var connection = _dbConnection.CreateConnection();
+
+    // Check if a company with the same product and company name already exists
+    string checkSql = @"
+        SELECT COUNT(*) 
+        FROM companies 
+        WHERE productName = @ProductName AND companyName = @CompanyName;";
+
+    var exists = await connection.ExecuteScalarAsync<int>(checkSql, new 
+    { 
+        CompanyName = newCompany.CompanyName, 
+        ProductName = newCompany.ProductName 
+    });
+
+    if (exists > 0)
     {
-         using var connection = _dbConnection.CreateConnection();
+        return "Company and product is not unique.";
+    }
 
-        string checkSql = "SELECT COUNT(*) FROM companies WHERE productName = @productName AND companyName = @companyName;";
+    // Insert new company details into the companies table
+    string sqlInsert = @"
+        INSERT INTO companies (CompanyName, ProductName, Country, LinkFormat)
+        VALUES (@CompanyName, @ProductName, @Country, @LinkFormat);";
 
+    // Execute the insert operation
+    await connection.ExecuteAsync(sqlInsert, new 
+    { 
+        CompanyName = newCompany.CompanyName, 
+        ProductName = newCompany.ProductName, 
+        Country = newCompany.Country, 
+        LinkFormat = newCompany.LinkFormat 
+    });
 
-        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { companyName = newCompany.CompanyName, productName= newCompany.ProductName});
+    // Fetch the newly inserted company by auto-incremented ID
+    string sqlSelect = @"
+        SELECT * 
+        FROM companies 
+        WHERE idcompanies = LAST_INSERT_ID();";
 
-        if (exists > 0)
-        {
-            return "Company and product is not unique";
-        }
+    // Get the newly created company
+    var createdCompany = await connection.QuerySingleAsync<Company>(sqlSelect);
 
-        string sql = @"
-            INSERT INTO companies (CompanyName, ProductName, LinkFormat, Country )
-            VALUES (@CompanyName, @ProductName, @Country, @LinkFormat);
+    // Return success message with details of the created company
+    return $"Company and product created successfully: {createdCompany.CompanyName} {createdCompany.ProductName}";
+}
 
-            SELECT * FROM companies WHERE idcompanies = LAST_INSERT_ID();"; // MySQL
+    public async Task<List<Company>> GetCompanies ()
+    {
+        using var connection = _dbConnection.CreateConnection();
 
-        var createdCompany = await connection.QuerySingleAsync<Company>(sql, new 
-        {
-           CompanyName = newCompany.CompanyName,
-           ProductName = newCompany.ProductName,
-           Country = newCompany.Country,
-           LinkFormat = newCompany.LinkFormat
-            
-        });
+        string sql = "SELECT * FROM companies";
+        var companies = await connection.QueryAsync<Company>(sql);
 
-        return $"Company and product created successfully: {createdCompany.CompanyName} {createdCompany.ProductName}";
+        return companies.ToList();
     }
 
      public async Task<List <Link>> GetCompanyLinks (string company)

@@ -1,10 +1,11 @@
-'use client'
-import React from 'react';
+"use client"; 
+import React from 'react'
 
 
-const SearchCompanies = () => {
+const AddLink = () => {
   return (
-    <div className="outline my-10 mx-10 py-5 px-5">
+    <div>
+       <div className="outline my-10 mx-10 py-5 px-5">
       <h1 className="text-2xl text-[#3E6259] font">Search Companies</h1>
       <div className="flex">
         <input
@@ -17,7 +18,8 @@ const SearchCompanies = () => {
         </button>
       </div>
     </div>
-  );
-};
+    </div>
+  )
+}
 
-export default SearchCompanies;
+export default AddLink

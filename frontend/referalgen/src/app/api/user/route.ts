@@ -60,13 +60,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'User UID and name are required' }, { status: 400 });
     }
 
-    const response = await fetch(`${apiUrl}/users/add`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newUser),
-    });
+  
     const response = await fetch(`${apiUrl}/users/add`, {
       method: 'POST',
       headers: {

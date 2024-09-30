@@ -1,11 +1,9 @@
-// components/UserLinks.tsx
+"use client";
 
-import React, { useState, useEffect } from 'react';
-
-// Define the type for each link
+import React from 'react';
 
 interface Link {
-  UID: number;
+  uid: string;
   owner: string;
   companyName: string;
   productName: string;
@@ -16,98 +14,71 @@ interface Link {
   used: number;
 }
 
-const UserLinks: React.FC = () => {
-  const [links, setLinks] = useState<Link[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+interface UserLinksProps {
+  links: Link[];
+}
+const refreshLinks = async () => {
+  try {
+      const data = fetch(`/api/user/?userId=test`);
+  } catch (error) {
+      console.error(error);
+  } 
+}
 
-  // Fetch the user links (replace with actual API endpoint)
-  useEffect(() => {
-    const fetchLinks = async () => {
-      try {
-        // Await the result of fetchUserLinks directly
-        const data = await fetchUserLinks("Test"); 
-        setLinks(data); // Assuming data is in the expected format
-      } catch (error) {
-        console.error('Error fetching links:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchLinks();
-  }, []);
+function UserLinks({ links }: UserLinksProps) {
 
-  const fetchUserLinks = async (userId: string) => {
-    const response = await fetch(`/api/user/?userId=${userId}`);
-    
+  const deleteLink = async (linkId: string) => {
+    const response = await fetch(`/api/links?id=${linkId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
     if (!response.ok) {
-      throw new Error('Failed to fetch user links');
+      throw new Error('Failed to delete link');
     }
-  
-    return response.json(); // No need for an additional await here
+
+    await refreshLinks();
   };
-  
 
-// Example for activating a link
-const deleteLink = async (linkId: number) => {
-  const response = await fetch(`/api/links/delete`, {
-    method: 'Delete',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ id: linkId }),
-  });
+  const activateLink = async (linkId: number) => {
+    const response = await fetch(`/api/links?editType=activate`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: linkId }),
+    });
 
-  if (!response.ok) {
-    throw new Error('Failed to activate link');
-  }
-  const data = await response.json();
-  return data;
-};
+    if (!response.ok) {
+      throw new Error('Failed to activate link');
+    }
 
-const activateLink = async (linkId: number) => {
-  const response = await fetch(`/api/links?editType=activate`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ id: linkId }),
-  });
+    await refreshLinks();
+  };
 
-  if (!response.ok) {
-    throw new Error('Failed to activate link');
-  }
-  const data = await response.json();
-  return data;
-};
+  const editLink = async (updatedLink: Link) => {
+    const response = await fetch(`/api/links`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedLink),
+    });
 
+    if (!response.ok) {
+      throw new Error('Failed to update link');
+    }
 
-// Example for editing a link
-const editLink = async (updatedLink: Link) => {
-  const response = await fetch(`/api/links`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(updatedLink),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to update link');
-  }
-  const data = await response.json();
-  return data;
-};
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+    await refreshLinks();
+  };
 
   return (
     <div>
       {links.length > 0 ? (
-        <table>
-          <thead>
+        <table className="mx-auto w-full md:w-3/4 border-collapse border border-gray-300">
+          <thead className="text-xl text-center text-black">
             <tr>
               <th>Company Name</th>
               <th>Product Name</th>
@@ -119,29 +90,32 @@ const editLink = async (updatedLink: Link) => {
           </thead>
           <tbody>
             {links.map((link) => (
-              <tr key={link.UID}>
+              <tr key={link.uid} className="text-xl text-center">
                 <td>{link.companyName}</td>
                 <td>{link.productName}</td>
                 <td>
-                  <a href={link.refLink} target="_blank" rel="noopener noreferrer">
+                  <a href={link.refLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                     {link.refLink}
                   </a>
                 </td>
                 <td>{link.seen}</td>
                 <td>{link.used}</td>
                 <td>
-                  <button onClick={() => editLink(link)}>Edit</button>
-                  <button onClick={() => deleteLink(link.UID)}>Delete</button>
+                  <button className="mx-4 bg-saffron text-black rounded-md py-2 px-4 hover:bg-saffron-dark" onClick={() => editLink(link)}>Edit</button>
+                  <button className="bg-red-300 text-black rounded-md py-2 px-4 hover:bg-red-400" onClick={() => deleteLink(link.uid)}>Delete</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
-        <p>You don't have any links yet!</p>
+        <p className="text-center">You don't have any links yet!</p>
       )}
+      <div className ="flex justify-center items-center my-10">
+        <button className ="btn btn-primary">Add New Link</button>
+      </div>
     </div>
   );
-};
+}
 
 export default UserLinks;

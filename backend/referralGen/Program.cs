@@ -71,6 +71,12 @@ app.MapGet("/company/links/{company}", async (string company, CompanyRepo compan
     return links != null ? Results.Ok(links) : Results.NotFound();
 });
 
+app.MapGet("/company/", async (CompanyRepo companyRepo) =>
+{
+    var links = await companyRepo.GetCompanies();
+    return links != null ? Results.Ok(links) : Results.NotFound();
+});
+
 app.MapPost ("/links/new", async (Link link, LinkRepo linkRepo) =>
 {
     var res = await linkRepo.AddNewLink(link);
@@ -113,7 +119,7 @@ app.MapPut("/links/edit", async (Link link, LinkRepo linkRepo) =>
     }
 });
 
-app.MapDelete( "/links/delete/{Id}", async(LinkRepo linkRepo, int Id)=>
+app.MapDelete( "/links/delete/{Id}", async(LinkRepo linkRepo, string Id)=>
 {
  try
     {

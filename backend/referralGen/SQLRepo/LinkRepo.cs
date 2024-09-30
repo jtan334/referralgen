@@ -9,40 +9,41 @@ public class LinkRepo(DatabaseConnection dbConnection)
 
     private readonly DatabaseConnection _dbConnection = dbConnection;
 
-    public async Task<string> AddNewLink(Link newLink)
+public async Task<string> AddNewLink(Link newLink)
+{
+    using var connection = _dbConnection.CreateConnection();
+
+    string checkSql = "SELECT COUNT(*) FROM links WHERE RefLink = @RefLink;";
+    
+    var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { RefLink = newLink.RefLink });
+
+    if (exists > 0)
     {
-        using var connection = _dbConnection.CreateConnection();
-
-        string checkSql = "SELECT COUNT(*) FROM links WHERE RefLink = @RefLink;";
-
-
-        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { RefLink = newLink.RefLink });
-
-        if (exists > 0)
-        {
-            return "The RefLink is not unique.";
-        }
-
-        string sql = @"
-            INSERT INTO links (RefLink, Owner, Used, Seen, CompanyName, ProductName, Country, Active)
-            VALUES (@RefLink, @Owner, @Used, @Seen, @CompanyName, @ProductName, @Country, @Active);
-
-            SELECT * FROM links WHERE UID = LAST_INSERT_ID();"; // MySQL
-
-        var createdLink = await connection.QuerySingleAsync<Link>(sql, new
-        {
-            RefLink = newLink.RefLink,
-            Owner = newLink.Owner,
-            Used = newLink.Used,
-            Seen = newLink.Seen,
-            CompanyName = newLink.CompanyName,
-            ProductName = newLink.ProductName,
-            Country = newLink.Country,
-            Active = newLink.Active
-        });
-
-        return $"Link created successfully: {createdLink.RefLink}";
+        return "The RefLink is not unique.";
     }
+
+    // Generate a new UUID for the UID
+    newLink.UID = Guid.NewGuid().ToString(); // Generate UUID
+
+    string sql = @"
+        INSERT INTO links (UID, RefLink, Owner, Used, Seen, CompanyName, ProductName, Country, Active)
+        VALUES (@UID, @RefLink, @Owner, @Used, @Seen, @CompanyName, @ProductName, @Country, @Active);";
+
+    await connection.ExecuteAsync(sql, new
+    {
+        UID = newLink.UID,
+        RefLink = newLink.RefLink,
+        Owner = newLink.Owner,
+        Used = newLink.Used,
+        Seen = newLink.Seen,
+        CompanyName = newLink.CompanyName,
+        ProductName = newLink.ProductName,
+        Country = newLink.Country,
+        Active = newLink.Active
+    });
+
+    return $"Link created successfully: {newLink.RefLink}";
+}
 
      public async Task<List<Link>> GetLink(int UID)
         {
@@ -102,7 +103,7 @@ public class LinkRepo(DatabaseConnection dbConnection)
             return "No changes were made to the link.";
         }
     }
- public async Task<string> DeleteLink(int UID)
+ public async Task<string> DeleteLink(string UID)
     {
         using var connection = _dbConnection.CreateConnection();
         var deleteQuery = "DELETE FROM links WHERE UID = @Uid";
