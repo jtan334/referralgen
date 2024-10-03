@@ -33,18 +33,21 @@ const SelectedCompany = ({ company }: SelectedCompanyProps) => {
   if (!visible || !company) return null;
 
   return (
-    <div className="mt-4 p-4 border rounded bg-gray-100 relative">
+    <div className="my-10 mx-10 py-5 px-5 border rounded bg-customwhite relative">
       <button
-        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+        className="absolute top-2 right-2 text-xl text-black hover:text-gray-700"
         onClick={handleClear}
       >
         X
       </button>
-      <h2 className="text-xl font-bold">{company.companyName}</h2>
+      <h2 className="text-xl font-bold text-black">{company.companyName}</h2>
       <p className="text-lg">{company.productName}</p>
-      <button onClick={handleGenerateLink} className="btn btn-primary mt-2">
+      <div className="flex justify-center items-center h-full">
+      <button onClick={handleGenerateLink} className="btn btn-primary mt-2 content-center">
         Generate Link
       </button>
+      </div>
+     
     </div>
   );
 };

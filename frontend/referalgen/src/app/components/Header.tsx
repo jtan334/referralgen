@@ -1,5 +1,5 @@
 import React from 'react'
-import SignOutButton from '../dashboard/SignOutButton'
+import SignOutButton from './SignOutButton'
 
 const Header = () => {
   return (

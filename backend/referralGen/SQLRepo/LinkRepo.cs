@@ -45,7 +45,7 @@ public async Task<string> AddNewLink(Link newLink)
     return $"Link created successfully: {newLink.RefLink}";
 }
 
-     public async Task<List<Link>> GetLink(int UID)
+     public async Task<List<Link>> GetLink(string UID)
         {
         using var connection = _dbConnection.CreateConnection();
 

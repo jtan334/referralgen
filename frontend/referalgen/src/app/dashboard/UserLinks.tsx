@@ -1,6 +1,7 @@
-"use client";
+// components/UserLinks.tsx
 
-import React from 'react';
+import React, { useState } from 'react';
+import AddNewLink from "./AddNewLink";  // Import the AddNewLink component
 
 interface Link {
   uid: string;
@@ -14,18 +15,30 @@ interface Link {
   used: number;
 }
 
+interface Company {
+  idCompanies: number;
+  companyName: string;
+  productName: string;
+  linkFormat: string;
+  country: string;
+}
+
 interface UserLinksProps {
   links: Link[];
-}
-const refreshLinks = async () => {
-  try {
-      const data = fetch(`/api/user/?userId=test`);
-  } catch (error) {
-      console.error(error);
-  } 
+  companies: Company[];
 }
 
 function UserLinks({ links }: UserLinksProps) {
+  const [showAddLink, setShowAddLink] = useState(false);  // State to manage the AddNewLink visibility
+
+  const refreshLinks = async () => {
+    try {
+      const data = await fetch(`/api/user/?userId=test`);
+      // Do something with the data
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const deleteLink = async (linkId: string) => {
     const response = await fetch(`/api/links?id=${linkId}`, {
@@ -74,6 +87,27 @@ function UserLinks({ links }: UserLinksProps) {
     await refreshLinks();
   };
 
+  const addNewLink = async (newLink: Link) => {
+    const response = await fetch(`/api/links`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newLink),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to add new link');
+    }
+
+    await refreshLinks();
+    setShowAddLink(false);  // Hide AddNewLink after successfully adding a link
+  };
+
+  const handleAddLinkClick = () => {
+    setShowAddLink(true);  // Show the AddNewLink component
+  };
+
   return (
     <div>
       {links.length > 0 ? (
@@ -111,9 +145,16 @@ function UserLinks({ links }: UserLinksProps) {
       ) : (
         <p className="text-center">You don't have any links yet!</p>
       )}
-      <div className ="flex justify-center items-center my-10">
-        <button className ="btn btn-primary">Add New Link</button>
+      <div className="flex justify-center items-center my-10">
+        {!showAddLink && (
+          <button className="btn btn-primary" onClick={handleAddLinkClick}>Add New Link</button>
+        )}
       </div>
+      {showAddLink && (
+        <AddNewLink
+          onClose={() => setShowAddLink(false)}
+          onAddLink={addNewLink} companies={[]}        />
+      )}
     </div>
   );
 }

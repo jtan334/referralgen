@@ -49,7 +49,7 @@ const SearchCompanies = ({ companies, onSelectCompany }: SearchCompaniesProps) =
   };
 
   return (
-    <div className="my-10 mx-10 py-5 px-5">
+    <div className="relative my-10 mx-10 py-5 px-5">
       <h1 className="text-2xl text-[#3E6259] font">Search Companies</h1>
       <div className="flex">
         <input
@@ -59,14 +59,15 @@ const SearchCompanies = ({ companies, onSelectCompany }: SearchCompaniesProps) =
           onChange={handleSearch}
           className="input input-bordered w-full max-w-x focus:ring-0 focus:border bg-white text-gray text-xl"
         />
+        
       </div>
-      
+     
       {filteredCompanies.length > 0 && (
-        <ul className="mt-4">
+        <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 shadow-lg rounded-md">
           {filteredCompanies.map(company => (
             <li 
               key={company.idCompanies} 
-              className="text-gray text-lg cursor-pointer hover:underline"
+              className="px-4 py-2 text-slate-500 text-lg cursor-pointer hover:bg-slate-200"
               onClick={() => handleCompanyClick(company)}
             >
               {company.companyName} - {company.productName}

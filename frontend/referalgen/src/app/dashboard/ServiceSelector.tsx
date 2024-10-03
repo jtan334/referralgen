@@ -46,7 +46,7 @@ const ServiceSelector = () => {
         </>
       );
     } else if (selectedHeading === 'My Links') {
-      return <UserLinks links={links} />;
+      return <UserLinks links={links} companies={companies} />;
     } else {
       return <p>Select a Service</p>;
     }
