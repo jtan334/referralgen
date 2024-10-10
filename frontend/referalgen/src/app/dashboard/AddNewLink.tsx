@@ -55,7 +55,7 @@ function AddNewLink({ onClose, onAddLink, companies }: AddNewLinkProps) {
 
   return (
     
-    <div className="p-4 border border-gray-300 rounded-md shadow-md">
+    <div className="p-2 border border-gray-300 rounded-md shadow-md">
       <div className="flex justify-end">
         <button onClick={onClose} className="text-red-500">X</button>
       </div>

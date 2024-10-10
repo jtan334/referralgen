@@ -10,7 +10,7 @@ interface Company {
 }
 
 interface SearchCompaniesProps {
-  companies: Company[];
+  companies: Company[]; // Receives the companies list from the parent
   onSelectCompany: (company: Company) => void; // Callback to pass the selected company to the parent
 }
 
@@ -23,7 +23,7 @@ const SearchCompanies = ({ companies, onSelectCompany }: SearchCompaniesProps) =
     setSearchTerm(value);
 
     if (value.trim() === '') {
-      setFilteredCompanies([]); // Clear results if input is empty
+      setFilteredCompanies([]);
       return;
     }
 
@@ -59,7 +59,6 @@ const SearchCompanies = ({ companies, onSelectCompany }: SearchCompaniesProps) =
           onChange={handleSearch}
           className="input input-bordered w-full max-w-x focus:ring-0 focus:border bg-white text-gray text-xl"
         />
-        
       </div>
      
       {filteredCompanies.length > 0 && (

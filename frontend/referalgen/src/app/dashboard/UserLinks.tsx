@@ -1,7 +1,5 @@
-// components/UserLinks.tsx
-
 import React, { useState } from 'react';
-import AddNewLink from "./AddNewLink";  // Import the AddNewLink component
+import AddNewLink from './AddNewLink';  // Import the AddNewLink component
 
 interface Link {
   uid: string;
@@ -28,7 +26,7 @@ interface UserLinksProps {
   companies: Company[];
 }
 
-function UserLinks({ links }: UserLinksProps) {
+function UserLinks({ links, companies }: UserLinksProps) {  // Correctly destructure here
   const [showAddLink, setShowAddLink] = useState(false);  // State to manage the AddNewLink visibility
 
   const refreshLinks = async () => {
@@ -153,7 +151,9 @@ function UserLinks({ links }: UserLinksProps) {
       {showAddLink && (
         <AddNewLink
           onClose={() => setShowAddLink(false)}
-          onAddLink={addNewLink} companies={[]}        />
+          onAddLink={addNewLink}
+          companies={companies}  // Pass the companies correctly here
+        />
       )}
     </div>
   );
