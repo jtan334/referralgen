@@ -29,6 +29,8 @@ function AddNewLink({ onClose, onAddLink, companies }: AddNewLinkProps) {
     used: 0,
   });
 
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLinkData((prevData) => ({
@@ -37,31 +39,56 @@ function AddNewLink({ onClose, onAddLink, companies }: AddNewLinkProps) {
     }));
   };
 
-  const handleCompanySelect = (selectedCompany: Company) => {
+  const handleCompanySelect = (company: Company) => {
+    setSelectedCompany(company);
     setLinkData((prevData) => ({
       ...prevData,
-      companyName: selectedCompany.companyName,
-      productName: selectedCompany.productName,
-      country: selectedCompany.country,
+      companyName: company.companyName,
+      productName: company.productName,
+      country: company.country,
+    }));
+  };
+
+  const handleResetSelection = () => {
+    setSelectedCompany(null);
+    setLinkData((prevData) => ({
+      ...prevData,
+      companyName: '',
+      productName: '',
+      country: '',
     }));
   };
 
   const handleAddLink = () => {
-
-    console.log(companies)
-    onAddLink(linkData);
-    onClose();
+    if (selectedCompany && linkData.refLink !== '') {
+      onAddLink(linkData);
+      console.log(linkData);
+      onClose();
+    }
   };
 
+  // Determine if the Add Link button should be enabled
+  const isAddLinkDisabled = !selectedCompany || linkData.refLink === '';
+
   return (
-    
     <div className="p-2 border border-gray-300 rounded-md shadow-md">
       <div className="flex justify-end">
         <button onClick={onClose} className="text-red-500">X</button>
       </div>
 
-      {/* SearchCompanies Component */}
-      <SearchCompanies companies={companies} onSelectCompany={handleCompanySelect} />
+      {/* Conditional Rendering */}
+      {selectedCompany ? (
+        <div className="border p-2 rounded bg-gray-100 flex justify-between items-center">
+          <div>
+            <p><strong>Company:</strong> {selectedCompany.companyName}</p>
+            <p><strong>Product:</strong> {selectedCompany.productName}</p>
+            <p><strong>Country:</strong> {selectedCompany.country}</p>
+          </div>
+          <button onClick={handleResetSelection} className="text-red-500 text-xl">X</button>
+        </div>
+      ) : (
+        <SearchCompanies companies={companies} onSelectCompany={handleCompanySelect} />
+      )}
 
       <div>
         <label>
@@ -76,8 +103,21 @@ function AddNewLink({ onClose, onAddLink, companies }: AddNewLinkProps) {
         </label>
       </div>
 
+      {/* Conditionally render the label */}
+      {isAddLinkDisabled && (
+        <p className="text-red-500 text-center mt-2">
+          Please select a company, product, and enter a referral link.
+        </p>
+      )}
+
       <div className="flex justify-center mt-4">
-        <button onClick={handleAddLink} className="btn btn-primary">Add Link</button>
+        <button
+          onClick={handleAddLink}
+          className={`btn btn-primary ${isAddLinkDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={isAddLinkDisabled}
+        >
+          Add Link
+        </button>
       </div>
     </div>
   );
