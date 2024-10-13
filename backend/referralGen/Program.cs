@@ -65,9 +65,9 @@ app.MapGet("/users/links/{userId}", async (string userId, UsersRepo usersRepo) =
     return links != null ? Results.Ok(links) : Results.NotFound();
 });
 
-app.MapGet("/company/links/{company}", async (string company, CompanyRepo companyRepo) =>
+app.MapGet("/company/links/{company}-{product}", async (string company, string product, CompanyRepo companyRepo) =>
 {
-    var links = await companyRepo.GetCompanyLinks(company);
+    var links = await companyRepo.GetCompanyLinks(company, product);
     return links != null ? Results.Ok(links) : Results.NotFound();
 });
 

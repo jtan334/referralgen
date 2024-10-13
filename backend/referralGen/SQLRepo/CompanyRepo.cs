@@ -73,12 +73,12 @@ public class CompanyRepo
         return companies.ToList();
     }
 
-     public async Task<List <Link>> GetCompanyLinks (string company)
+     public async Task<List <Link>> GetCompanyLinks (string company, string product)
     {
         using var connection = _dbConnection.CreateConnection();
 
-        string sql = "SELECT * FROM links WHERE companyName = @companyName";
-        var links = await connection.QueryAsync<Link>(sql, new { companyName = company });
+        string sql = "SELECT * FROM links WHERE companyName = @companyName AND productName = @productName" ;
+        var links = await connection.QueryAsync<Link>(sql, new { companyName = company, productName = product });
 
         return links.ToList();
     }

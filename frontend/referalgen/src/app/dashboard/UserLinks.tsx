@@ -32,7 +32,6 @@ function UserLinks({ links, companies }: UserLinksProps) {  // Correctly destruc
   const refreshLinks = async () => {
     try {
       const data = await fetch(`/api/user/?userId=test`);
-      // Do something with the data
     } catch (error) {
       console.error(error);
     }
