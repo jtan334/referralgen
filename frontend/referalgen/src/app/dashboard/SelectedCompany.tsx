@@ -2,14 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLinkGeneration } from './useLinkGeneration'; // Custom hook for link generation logic
 import LinkDisplay from './LinkDisplay'; // Component to display selected link
+import {Company} from './types/types'
 
-interface Company {
-  idCompanies: number;
-  companyName: string;
-  productName: string;
-  linkFormat: string;
-  country: string;
-}
+
+
 
 interface SelectedCompanyProps {
   company: Company | null;

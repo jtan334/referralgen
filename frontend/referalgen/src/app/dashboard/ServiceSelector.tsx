@@ -1,28 +1,9 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import SearchCompanies from './SearchCompanies';
+import SearchCompanies from './components/SearchCompanies';
 import UserLinks from './UserLinks';
 import SelectedCompany from './SelectedCompany';
-
-interface Link {
-  uid: string;
-  owner: string;
-  companyName: string;
-  productName: string;
-  country: string;
-  active: boolean;
-  refLink: string;
-  seen: number;
-  used: number;
-}
-
-interface Company {
-  idCompanies: number;
-  companyName: string;
-  productName: string;
-  linkFormat: string;
-  country: string;
-}
+import {Link, Company} from './types/types'
 
 const ServiceSelector = () => {
   const [selectedHeading, setSelectedHeading] = useState<string>('My Links');

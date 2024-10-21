@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AddNewLink from './AddNewLink';  // Import the AddNewLink component
+import AddNewLink from './components/AddNewLink';  // Import the AddNewLink component
 
 interface Link {
   uid: string;

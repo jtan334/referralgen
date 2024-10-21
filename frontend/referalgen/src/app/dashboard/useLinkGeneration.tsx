@@ -1,21 +1,6 @@
 import { useState } from 'react';
+import {Link, Company} from './types/types'
 
-interface Link {
-  uid: string;
-  owner: string;
-  companyName: string;
-  productName: string;
-  country: string;
-  active: boolean;
-  refLink: string;
-  seen: number;
-  used: number;
-}
-
-interface Company {
-  companyName: string;
-  productName: string;
-}
 
 export const useLinkGeneration = (company: Company | null) => {
   const [selectedLink, setSelectedLink] = useState<Link | null>(null);

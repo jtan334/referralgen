@@ -1,16 +1,7 @@
 import React from 'react';
+import {Link} from './types/types'
 
-interface Link {
-  uid: string;
-  owner: string;
-  companyName: string;
-  productName: string;
-  country: string;
-  active: boolean;
-  refLink: string;
-  seen: number;
-  used: number;
-}
+
 
 interface LinkDisplayProps {
   selectedLink: Link | null;
