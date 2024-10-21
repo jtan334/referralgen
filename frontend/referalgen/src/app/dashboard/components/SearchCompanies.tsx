@@ -1,13 +1,7 @@
 'use client';
 import React, { useState } from 'react';
+import {Company} from '../types/types'
 
-interface Company {
-  idCompanies: number;
-  companyName: string;
-  productName: string;
-  linkFormat: string;
-  country: string;
-}
 
 interface SearchCompaniesProps {
   companies: Company[]; // Receives the companies list from the parent

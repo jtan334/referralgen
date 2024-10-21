@@ -1,14 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import SearchCompanies from './SearchCompanies';
+import {Company} from '../types/types'
 
-interface Company {
-  idCompanies: number;
-  companyName: string;
-  productName: string;
-  linkFormat: string;
-  country: string;
-}
 
 interface AddNewLinkProps {
   onClose: () => void;

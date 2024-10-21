@@ -1,25 +1,7 @@
 import React, { useState } from 'react';
 import AddNewLink from './components/AddNewLink';  // Import the AddNewLink component
+import {Link, Company} from './types/types'
 
-interface Link {
-  uid: string;
-  owner: string;
-  companyName: string;
-  productName: string;
-  country: string;
-  active: boolean;
-  refLink: string;
-  seen: number;
-  used: number;
-}
-
-interface Company {
-  idCompanies: number;
-  companyName: string;
-  productName: string;
-  linkFormat: string;
-  country: string;
-}
 
 interface UserLinksProps {
   links: Link[];
