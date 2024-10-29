@@ -57,41 +57,44 @@ public class LinkRepo(DatabaseConnection dbConnection)
         return links.ToList();
     }
 
-    public async Task<string> EditLink(Link link)
+  public async Task<string> EditLink(Link link)
+{
+    using var connection = _dbConnection.CreateConnection();
+
+    // Check if the link exists
+    string checkSql = "SELECT COUNT(*) FROM links WHERE UID = @UID;";
+    var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { link.UID });
+
+    if (exists == 0)
     {
-        using var connection = _dbConnection.CreateConnection();
-        // Check if the link exists
-        string checkSql = "SELECT COUNT(*) FROM links WHERE UID = @UID;";
-        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { link.UID });
+        return "The link does not exist."; // Return error if link is not found
+    }
 
-        if (exists == 0)
-        {
-            return "The link does not exist."; // Return error if link is not found
-        }
-
-        // Update the link details
-        string updateSql = @"
+    // Update the link details
+    string updateSql = @"
     UPDATE links
     SET RefLink = @RefLink,
         Updated = @Updated
     WHERE UID = @UID;";
 
-        int rowsAffected = await connection.ExecuteAsync(updateSql, new
-        {
-            RefLink = link.RefLink,
-            Updated = DateTime.UtcNow,
-            UID = link.UID
-        });
-        // Check if any rows were updated
-        if (rowsAffected > 0)
-        {
-            return "Link updated successfully.";
-        }
-        else
-        {
-            return "No changes were made to the link.";
-        }
+    int rowsAffected = await connection.ExecuteAsync(updateSql, new
+    {
+        link.RefLink,
+        Updated = DateTime.UtcNow,
+        link.UID
+    });
+
+    // Check if any rows were updated
+    if (rowsAffected > 0)
+    {
+        return "Link updated successfully.";
     }
+    else
+    {
+        return "No changes were made to the link.";
+    }
+}
+
     public async Task<string> DeleteLink(string UID)
     {
         using var connection = _dbConnection.CreateConnection();
