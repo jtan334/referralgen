@@ -9,44 +9,44 @@ public class LinkRepo(DatabaseConnection dbConnection)
 
     private readonly DatabaseConnection _dbConnection = dbConnection;
 
-public async Task<string> AddNewLink(Link newLink)
-{
-    using var connection = _dbConnection.CreateConnection();
-
-    string checkSql = "SELECT COUNT(*) FROM links WHERE RefLink = @RefLink;";
-    
-    var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { RefLink = newLink.RefLink });
-
-    if (exists > 0)
+    public async Task<string> AddNewLink(Link newLink)
     {
-        return "The RefLink is not unique.";
-    }
+        using var connection = _dbConnection.CreateConnection();
 
-    // Generate a new UUID for the UID
-    newLink.UID = Guid.NewGuid().ToString(); // Generate UUID
+        string checkSql = "SELECT COUNT(*) FROM links WHERE RefLink = @RefLink;";
 
-    string sql = @"
+        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { RefLink = newLink.RefLink });
+
+        if (exists > 0)
+        {
+            return "The RefLink is not unique.";
+        }
+
+        // Generate a new UUID for the UID
+        newLink.UID = Guid.NewGuid().ToString(); // Generate UUID
+
+        string sql = @"
         INSERT INTO links (UID, RefLink, Owner, Used, Seen, CompanyName, ProductName, Country, Active)
         VALUES (@UID, @RefLink, @Owner, @Used, @Seen, @CompanyName, @ProductName, @Country, @Active);";
 
-    await connection.ExecuteAsync(sql, new
-    {
-        UID = newLink.UID,
-        RefLink = newLink.RefLink,
-        Owner = newLink.Owner,
-        Used = newLink.Used,
-        Seen = newLink.Seen,
-        CompanyName = newLink.CompanyName,
-        ProductName = newLink.ProductName,
-        Country = newLink.Country,
-        Active = newLink.Active
-    });
-
-    return $"Link created successfully: {newLink.RefLink}";
-}
-
-     public async Task<List<Link>> GetLink(string UID)
+        await connection.ExecuteAsync(sql, new
         {
+            UID = newLink.UID,
+            RefLink = newLink.RefLink,
+            Owner = newLink.Owner,
+            Used = newLink.Used,
+            Seen = newLink.Seen,
+            CompanyName = newLink.CompanyName,
+            ProductName = newLink.ProductName,
+            Country = newLink.Country,
+            Active = newLink.Active
+        });
+
+        return $"Link created successfully: {newLink.RefLink}";
+    }
+
+    public async Task<List<Link>> GetLink(string UID)
+    {
         using var connection = _dbConnection.CreateConnection();
 
         string sql = "SELECT * FROM links WHERE UID = @UID";
@@ -55,8 +55,8 @@ public async Task<string> AddNewLink(Link newLink)
         return links.ToList();
     }
 
- public async Task<string> EditLink(Link link)
-{
+    public async Task<string> EditLink(Link link)
+    {
         using var connection = _dbConnection.CreateConnection();
         // Check if the link exists
         string checkSql = "SELECT COUNT(*) FROM links WHERE UID = @UID;";
@@ -90,7 +90,7 @@ public async Task<string> AddNewLink(Link newLink)
             ProductName = link.ProductName,
             Country = link.Country,
             Active = link.Active,
-            UID = link.UID 
+            UID = link.UID
         });
 
         // Check if any rows were updated
@@ -103,7 +103,7 @@ public async Task<string> AddNewLink(Link newLink)
             return "No changes were made to the link.";
         }
     }
- public async Task<string> DeleteLink(string UID)
+    public async Task<string> DeleteLink(string UID)
     {
         using var connection = _dbConnection.CreateConnection();
         var deleteQuery = "DELETE FROM links WHERE UID = @Uid";
@@ -123,22 +123,56 @@ public async Task<string> AddNewLink(Link newLink)
             throw new Exception("An error occurred while deleting the link.", ex);
         }
     }
-    
 
-    public async Task <string> ActivateLink (int UID){
 
-         using var connection = _dbConnection.CreateConnection();
-         var activateQuery = "UPDATE links SET active = 1 WHERE UID =@UID";
+    public async Task<string> ActivateLink(string UID)
+    {
 
-        try{
+        using var connection = _dbConnection.CreateConnection();
+        var activateQuery = "UPDATE links SET active = 1 WHERE UID =@UID";
+
+        try
+        {
             var activateLink = await connection.ExecuteAsync(activateQuery, new { UID });
             return $"Successfully activated {UID}";
         }
-         catch (Exception ex)
+        catch (Exception ex)
         {
             throw new Exception("An error occurred while activating the link.", ex);
         }
 
+    }
+
+    public async Task<string> AddSeenAsync(string UID)
+    {
+        using var connection = _dbConnection.CreateConnection();
+
+        // Check if the link exists
+        string checkSql = "SELECT COUNT(*) FROM links WHERE UID = @UID;";
+        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { UID });
+
+        if (exists == 0)
+        {
+            return "The link does not exist."; // Return error if link is not found
+        }
+
+        // Increment the Seen count
+        string updateSql = @"
+        UPDATE links
+        SET Seen = Seen + 1
+        WHERE UID = @UID;";
+
+        int rowsAffected = await connection.ExecuteAsync(updateSql, new { UID });
+
+        // Confirm if the Seen count was incremented
+        if (rowsAffected > 0)
+        {
+            return "Seen count updated successfully.";
+        }
+        else
+        {
+            return "Failed to update the Seen count.";
+        }
     }
 
 

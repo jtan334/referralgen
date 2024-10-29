@@ -15,10 +15,10 @@ const SuggestNewCompany = () => {
 
   return (
     <div className="p-4 bg-gray-100 rounded-md">
-      <h2 className="text-lg font-bold mb-4">Suggest New Company and Product</h2>
+      <h2 className="text-lg font-bold mb-4 text-black">Suggest New Company and Product</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="company" className="block text-sm font-medium text-gray-700 ">Company</label>
+          <label htmlFor="company" className="block text-sm font-medium text-gray ">Company</label>
           <input
             type="text"
             id="company"
@@ -30,7 +30,7 @@ const SuggestNewCompany = () => {
         </div>
 
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Product Name</label>
+          <label htmlFor="name" className="block text-sm font-medium text-gray">Product Name</label>
           <input
             type="text"
             id="name"
@@ -42,7 +42,7 @@ const SuggestNewCompany = () => {
         </div>
 
         <div>
-          <label htmlFor="referralLink" className="block text-sm font-medium text-gray-700">Referral Link</label>
+          <label htmlFor="referralLink" className="block text-sm font-medium text-gray">Referral Link</label>
           <input
             type="url"
             id="referralLink"

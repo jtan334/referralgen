@@ -135,7 +135,7 @@ app.MapDelete( "/links/delete/{Id}", async(LinkRepo linkRepo, string Id)=>
 
 });
 
-app.MapPut ("links/edit/activate", async(LinkRepo linkRepo, int id) =>
+app.MapPut ("links/edit/activate", async(LinkRepo linkRepo, string id) =>
 {
     try{
         var result = await linkRepo.ActivateLink(id);
@@ -146,6 +146,19 @@ app.MapPut ("links/edit/activate", async(LinkRepo linkRepo, int id) =>
         return Results.BadRequest(ex);
     }
 });
+
+app.MapPut ("links/update/seen", async(LinkRepo linkRepo,string id) =>
+{
+    try{
+        var result = await linkRepo.AddSeenAsync(id);
+        return Results.Ok(result);
+    }
+    catch(Exception ex)
+    {
+        return Results.BadRequest(ex);
+    }
+});
+
 
 app.MapPost ("company/add", async(CompanyRepo companyRepo, Company company)=>
 {
