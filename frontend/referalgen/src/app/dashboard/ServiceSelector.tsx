@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import SearchCompanies from './components/SearchCompanies';
 import UserLinks from './UserLinks';
 import SelectedCompany from './SelectedCompany';
-import {Link, Company} from './types/types'
+import {Link, Company} from '../types/types'
 
 const ServiceSelector = () => {
   const [selectedHeading, setSelectedHeading] = useState<string>('My Links');

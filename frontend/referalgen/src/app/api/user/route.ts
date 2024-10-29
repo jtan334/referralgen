@@ -1,21 +1,5 @@
 import { NextResponse } from 'next/server';
-
-interface Link {
-  UID: number;
-  owner: string;
-  companyName: string;
-  productName: string;
-  country: string;
-  active: boolean;
-  refLink: string;
-  seen: number;
-  used: number;
-}
-
-interface User {
-  UID: string;
-  name: string;
-}
+import{User, Link} from '../../types/types';
 
 const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL; // Place this outside the handlers if it's shared
 
@@ -56,7 +40,7 @@ export async function POST(request: Request) {
   try {
     const newUser: User = await request.json();
 
-    if (!newUser.UID || !newUser.name) {
+    if (!newUser.uid || !newUser.name) {
       return NextResponse.json({ message: 'User UID and name are required' }, { status: 400 });
     }
 

@@ -1,17 +1,5 @@
 import { NextResponse } from 'next/server';
-
-// Define the Link interface
-interface Link {
-  UID: string;
-  owner: string;
-  companyName: string;
-  productName: string;
-  country: string;
-  active: boolean;
-  refLink: string;
-  seen: number;
-  used: number;
-}
+import {Link} from '../../types/types'
 
 // GET request handler
 export async function GET(req: Request) {

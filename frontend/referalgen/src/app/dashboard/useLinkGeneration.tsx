@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {Link, Company} from './types/types'
+import {Link, Company} from '../types/types'
 
 
 export const useLinkGeneration = (company: Company | null) => {

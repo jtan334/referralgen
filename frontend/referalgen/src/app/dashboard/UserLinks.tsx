@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AddNewLink from './components/AddNewLink';  // Import the AddNewLink component
-import {Link, Company} from './types/types'
+import {Link, Company} from '../types/types'
 
 
 interface UserLinksProps {

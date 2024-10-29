@@ -1,16 +1,5 @@
 import { NextResponse } from 'next/server';
-
-interface Link {
-    UID: string;
-    owner: string;
-    companyName: string;
-    productName: string;
-    country: string;
-    active: boolean;
-    refLink: string;
-    seen: number;
-    used: number;
-  }
+import {Link} from '../../../types/types'
 
 export async function GET(req: Request) {
     const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL;

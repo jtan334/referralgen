@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import SearchCompanies from './SearchCompanies';
-import {Company} from '../types/types'
+import {Company} from '../../types/types'
 
 
 interface AddNewLinkProps {

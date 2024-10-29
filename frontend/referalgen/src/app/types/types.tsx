@@ -8,6 +8,8 @@ export interface Link {
     refLink: string;
     seen: number;
     used: number;
+    created: Date;
+    updated: Date;
   }
   
   export interface Company {
