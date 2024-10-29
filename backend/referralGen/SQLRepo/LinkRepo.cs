@@ -73,28 +73,14 @@ public class LinkRepo(DatabaseConnection dbConnection)
         string updateSql = @"
     UPDATE links
     SET RefLink = @RefLink,
-        Owner = @Owner,
-        Used = @Used,
-        Seen = @Seen,
-        CompanyName = @CompanyName,
-        ProductName = @ProductName,
-        Country = @Country,
-        Active = @Active,
-        UpdatedAt = @UpdatedAt
+        Updated = @Updated
     WHERE UID = @UID;";
 
         int rowsAffected = await connection.ExecuteAsync(updateSql, new
         {
             RefLink = link.RefLink,
-            Owner = link.Owner,
-            Used = link.Used,
-            Seen = link.Seen,
-            CompanyName = link.CompanyName,
-            ProductName = link.ProductName,
-            Country = link.Country,
-            Active = link.Active,
-            UID = link.UID,
-            UpdatedAt = DateTime.UtcNow
+            Updated = DateTime.UtcNow,
+            UID = link.UID
         });
         // Check if any rows were updated
         if (rowsAffected > 0)
