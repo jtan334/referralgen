@@ -26,8 +26,8 @@ public class LinkRepo(DatabaseConnection dbConnection)
         newLink.UID = Guid.NewGuid().ToString(); // Generate UUID
 
         string sql = @"
-        INSERT INTO links (UID, RefLink, Owner, Used, Seen, CompanyName, ProductName, Country, Active)
-        VALUES (@UID, @RefLink, @Owner, @Used, @Seen, @CompanyName, @ProductName, @Country, @Active);";
+        INSERT INTO links (UID, RefLink, Owner, Used, Seen, CompanyName, ProductName, Country, Active, Created, Updated)
+        VALUES (@UID, @RefLink, @Owner, @Used, @Seen, @CompanyName, @ProductName, @Country, @Active, @Created, @Updated);";
 
         await connection.ExecuteAsync(sql, new
         {
@@ -39,7 +39,9 @@ public class LinkRepo(DatabaseConnection dbConnection)
             CompanyName = newLink.CompanyName,
             ProductName = newLink.ProductName,
             Country = newLink.Country,
-            Active = newLink.Active
+            Active = newLink.Active,
+            Created = DateTime.UtcNow,
+            Updated = DateTime.UtcNow
         });
 
         return $"Link created successfully: {newLink.RefLink}";
@@ -69,16 +71,17 @@ public class LinkRepo(DatabaseConnection dbConnection)
 
         // Update the link details
         string updateSql = @"
-            UPDATE links
-            SET RefLink = @RefLink,
-                Owner = @Owner,
-                Used = @Used,
-                Seen = @Seen,
-                CompanyName = @CompanyName,
-                ProductName = @ProductName,
-                Country = @Country,
-                Active = @Active
-            WHERE UID = @UID;";
+    UPDATE links
+    SET RefLink = @RefLink,
+        Owner = @Owner,
+        Used = @Used,
+        Seen = @Seen,
+        CompanyName = @CompanyName,
+        ProductName = @ProductName,
+        Country = @Country,
+        Active = @Active,
+        UpdatedAt = @UpdatedAt
+    WHERE UID = @UID;";
 
         int rowsAffected = await connection.ExecuteAsync(updateSql, new
         {
@@ -90,9 +93,9 @@ public class LinkRepo(DatabaseConnection dbConnection)
             ProductName = link.ProductName,
             Country = link.Country,
             Active = link.Active,
-            UID = link.UID
+            UID = link.UID,
+            UpdatedAt = DateTime.UtcNow
         });
-
         // Check if any rows were updated
         if (rowsAffected > 0)
         {

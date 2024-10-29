@@ -83,11 +83,9 @@ app.MapPost ("/links/new", async (Link link, LinkRepo linkRepo) =>
 
     if (res != null){
          if (res == "The RefLink is not unique") {
-            Console.WriteLine("reaches the if");
             return Results.BadRequest(res);
         }
         else{
-            Console.WriteLine("reached the else");
             return Results.Ok(res);
         }
     }
