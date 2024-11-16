@@ -15,7 +15,7 @@ export async function GET(req: Request) {
       });
   
       if (!response.ok) {
-        throw new Error('Failed to fetch user links');
+        throw new Error('Failed to fetch companies');
       }
   
       const data: Company[] = await response.json();
