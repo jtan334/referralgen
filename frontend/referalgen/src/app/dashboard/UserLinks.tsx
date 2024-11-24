@@ -1,24 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddNewLink from "./components/AddNewLink"; // Import the AddNewLink component
 import { Link, Company } from "../types/types";
 
 interface UserLinksProps {
-  links: Link[];
   companies: Company[];
 }
 
-function UserLinks({ links, companies }: UserLinksProps) {
-  // Correctly destructure here
+function UserLinks({ companies }: UserLinksProps) {
+  const [links, setLinks] = useState<Link[]>([]); // State to store the links
   const [showAddLink, setShowAddLink] = useState(false); // State to manage the AddNewLink visibility
 
+  // Fetch links initially when the component mounts
+  useEffect(() => {
+    const fetchLinks = async () => {
+      try {
+        const response = await fetch(`/api/user/?userId=test`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch links");
+        }
+        const data = await response.json();
+        setLinks(data); // Set the fetched data to the state
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchLinks();
+  }, []); // Only run once on mount
+
+  // Fetch and refresh links
   const refreshLinks = async () => {
     try {
-      const data = await fetch(`/api/user/?userId=test`);
+      const response = await fetch(`/api/user/?userId=test`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch links");
+      }
+      const data = await response.json();
+      setLinks(data); // Update the links state after the fetch
     } catch (error) {
       console.error(error);
     }
   };
 
+  // Delete link
   const deleteLink = async (linkId: string) => {
     const response = await fetch(`/api/links?id=${linkId}`, {
       method: "DELETE",
@@ -31,12 +55,13 @@ function UserLinks({ links, companies }: UserLinksProps) {
       throw new Error("Failed to delete link");
     }
 
-    await refreshLinks();
+    await refreshLinks(); // Refresh links after deletion
   };
 
+  // Activate link
   const activateLink = async (linkId: number) => {
     const response = await fetch(`/api/links?editType=activate`, {
-      method: "PUT",
+      method: "PATCH", // Use PATCH for activation
       headers: {
         "Content-Type": "application/json",
       },
@@ -47,12 +72,13 @@ function UserLinks({ links, companies }: UserLinksProps) {
       throw new Error("Failed to activate link");
     }
 
-    await refreshLinks();
+    await refreshLinks(); // Refresh links after activation
   };
 
+  // Edit link
   const editLink = async (updatedLink: Link) => {
     const response = await fetch(`/api/links`, {
-      method: "PUT",
+      method: "PUT", // Use PUT for full update
       headers: {
         "Content-Type": "application/json",
       },
@@ -63,12 +89,13 @@ function UserLinks({ links, companies }: UserLinksProps) {
       throw new Error("Failed to update link");
     }
 
-    await refreshLinks();
+    await refreshLinks(); // Refresh links after editing
   };
 
+  // Add new link
   const addNewLink = async (newLink: Link) => {
     const response = await fetch(`/api/links`, {
-      method: "POST",
+      method: "POST", // Use POST for adding new link
       headers: {
         "Content-Type": "application/json",
       },
@@ -79,8 +106,8 @@ function UserLinks({ links, companies }: UserLinksProps) {
       throw new Error("Failed to add new link");
     }
 
-    await refreshLinks();
-    setShowAddLink(false); // Hide AddNewLink after successfully adding a link
+    await refreshLinks(); // Refresh links after adding
+    setShowAddLink(false); // Hide AddNewLink after adding
   };
 
   const handleAddLinkClick = () => {

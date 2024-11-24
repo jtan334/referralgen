@@ -57,43 +57,43 @@ public class LinkRepo(DatabaseConnection dbConnection)
         return links.ToList();
     }
 
-  public async Task<string> EditLink(Link link)
-{
-    using var connection = _dbConnection.CreateConnection();
-
-    // Check if the link exists
-    string checkSql = "SELECT COUNT(*) FROM links WHERE UID = @UID;";
-    var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { link.UID });
-
-    if (exists == 0)
+    public async Task<string> EditLink(Link link)
     {
-        return "The link does not exist."; // Return error if link is not found
-    }
+        using var connection = _dbConnection.CreateConnection();
 
-    // Update the link details
-    string updateSql = @"
+        // Check if the link exists
+        string checkSql = "SELECT COUNT(*) FROM links WHERE UID = @UID;";
+        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { link.UID });
+
+        if (exists == 0)
+        {
+            return "The link does not exist."; // Return error if link is not found
+        }
+
+        // Update the link details
+        string updateSql = @"
     UPDATE links
     SET RefLink = @RefLink,
         Updated = @Updated
     WHERE UID = @UID;";
 
-    int rowsAffected = await connection.ExecuteAsync(updateSql, new
-    {
-        link.RefLink,
-        Updated = DateTime.UtcNow,
-        link.UID
-    });
+        int rowsAffected = await connection.ExecuteAsync(updateSql, new
+        {
+            link.RefLink,
+            Updated = DateTime.UtcNow,
+            link.UID
+        });
 
-    // Check if any rows were updated
-    if (rowsAffected > 0)
-    {
-        return "Link updated successfully.";
+        // Check if any rows were updated
+        if (rowsAffected > 0)
+        {
+            return "Link updated successfully.";
+        }
+        else
+        {
+            return "No changes were made to the link.";
+        }
     }
-    else
-    {
-        return "No changes were made to the link.";
-    }
-}
 
     public async Task<string> DeleteLink(string UID)
     {
@@ -119,21 +119,31 @@ public class LinkRepo(DatabaseConnection dbConnection)
 
     public async Task<string> ActivateLink(string UID)
     {
-
         using var connection = _dbConnection.CreateConnection();
-        var activateQuery = "UPDATE links SET active = 1 WHERE UID =@UID";
+        var activateQuery = "UPDATE links SET active = 1 WHERE UID = @UID";
 
         try
         {
-            var activateLink = await connection.ExecuteAsync(activateQuery, new { UID });
+            var rowsAffected = await connection.ExecuteAsync(activateQuery, new { UID });
+
+            if (rowsAffected == 0)
+            {
+                throw new KeyNotFoundException($"No link found with UID: {UID}");
+            }
+
             return $"Successfully activated {UID}";
+        }
+        catch (KeyNotFoundException ex)
+        {
+            // Handle specific case where no matching UID exists
+            return $"Activation failed: {ex.Message}";
         }
         catch (Exception ex)
         {
             throw new Exception("An error occurred while activating the link.", ex);
         }
-
     }
+
 
     public async Task<string> AddSeenAsync(string UID)
     {

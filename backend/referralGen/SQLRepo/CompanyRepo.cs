@@ -38,8 +38,8 @@ public class CompanyRepo
 
     // Insert new company details into the companies table
     string sqlInsert = @"
-        INSERT INTO companies (CompanyName, ProductName, Country, LinkFormat)
-        VALUES (@CompanyName, @ProductName, @Country, @LinkFormat);";
+        INSERT INTO companies (CompanyName, ProductName, Country, LinkFormat, Approval)
+        VALUES (@CompanyName, @ProductName, @Country, @LinkFormat, @Approval);";
 
     // Execute the insert operation
     await connection.ExecuteAsync(sqlInsert, new 
@@ -47,7 +47,8 @@ public class CompanyRepo
         CompanyName = newCompany.CompanyName, 
         ProductName = newCompany.ProductName, 
         Country = newCompany.Country, 
-        LinkFormat = newCompany.LinkFormat 
+        LinkFormat = newCompany.LinkFormat, 
+        Approval = "pending"
     });
 
     // Fetch the newly inserted company by auto-incremented ID
@@ -82,4 +83,25 @@ public class CompanyRepo
 
         return links.ToList();
     }
+
+    public async Task<string> ApproveCompany(int companyId)
+{
+    using var connection = _dbConnection.CreateConnection();
+
+    // Update the approval field to 'approved' for the specified company ID
+    string sqlUpdate = @"
+        UPDATE companies 
+        SET Approval = 'approved' 
+        WHERE idcompanies = @CompanyId;";
+
+    // Execute the update operation
+    int rowsAffected = await connection.ExecuteAsync(sqlUpdate, new { CompanyId = companyId });
+
+    if (rowsAffected == 0)
+    {
+        return "Company not found or already approved.";
+    }
+
+    return $"Company with ID {companyId} approved successfully.";
+}
 }

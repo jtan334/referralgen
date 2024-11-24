@@ -64,48 +64,58 @@ export async function POST(req: Request) {
 // PUT request handler
 export async function PUT(req: Request) {
   const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL;
-  const { searchParams } = new URL(req.url);
-  const editType = searchParams.get('editType');
 
   try {
     const body = await req.json();
+    const updatedLink: Link = body;
 
-    if (editType === 'activate') {
-      const linkId = body.id;
-      const response = await fetch(`${apiUrl}/links/edit/activate`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id: linkId }),
-      });
+    const response = await fetch(`${apiUrl}/links/edit`, {
+      method: 'PUT',  // PUT method for editing
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedLink),
+    });
 
-      if (!response.ok) {
-        throw new Error('Failed to activate link');
-      }
-
-      const data = await response.json();
-      return NextResponse.json(data, { status: 200 });
-    } else {
-      const updatedLink: Link = body;
-      const response = await fetch(`${apiUrl}/links/edit`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedLink),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update link');
-      }
-
-      const data = await response.json();
-      return NextResponse.json(data, { status: 200 });
+    if (!response.ok) {
+      throw new Error('Failed to update link');
     }
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { message: 'Failed to update link', error: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
+
+// For PATCH requests (activating the link)
+export async function PATCH(req: Request) {
+  const apiUrl = process.env.NEXT_PUBLIC_ASP_NET_API_URL;
+
+  try {
+    const body = await req.json();
+    const linkId = body.id;
+
+    const response = await fetch(`${apiUrl}/links/edit/activate`, {
+      method: 'PATCH',  // PATCH method for activation
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: linkId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to activate link');
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { message: 'Failed to activate link', error: (error as Error).message },
       { status: 500 }
     );
   }

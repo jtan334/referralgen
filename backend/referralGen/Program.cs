@@ -133,7 +133,7 @@ app.MapDelete( "/links/delete/{Id}", async(LinkRepo linkRepo, string Id)=>
 
 });
 
-app.MapPut ("links/edit/activate", async(LinkRepo linkRepo, string id) =>
+app.MapPatch ("links/edit/activate", async(LinkRepo linkRepo, string id) =>
 {
     try{
         var result = await linkRepo.ActivateLink(id);
@@ -145,7 +145,7 @@ app.MapPut ("links/edit/activate", async(LinkRepo linkRepo, string id) =>
     }
 });
 
-app.MapPut ("links/update/seen", async(LinkRepo linkRepo,string id) =>
+app.MapPatch ("links/update/seen", async(LinkRepo linkRepo,string id) =>
 {
     try{
         var result = await linkRepo.AddSeenAsync(id);
@@ -175,6 +175,30 @@ app.MapPost ("company/add", async(CompanyRepo companyRepo, Company company)=>
     }
 });
 
+app.MapPatch("/company/{id}/approve", async (CompanyRepo companyRepo, int id) =>
+{
+    try
+    {
+        // Call the repository method to approve the company
+        var result = await companyRepo.ApproveCompany(id);
+
+        // Return appropriate responses based on the result
+        if (result.Contains("not found"))
+        {
+            return Results.NotFound(new { message = result });
+        }
+
+        return Results.Ok(new { message = result });
+    }
+    catch (Exception ex)
+    {
+        // Use Results.Object to return a status code with a response body
+        return Results.Problem(detail: ex.Message, statusCode: 500, title: "An error occurred while approving the company.");
+    }
+});
+
+
+
 app.MapPost("users/add", async(UsersRepo usersRepo, Users user)=>
 {
 
@@ -201,6 +225,8 @@ app.MapDelete("users/delete/{userId}", async(UsersRepo usersRepo, string userId)
         return Results.BadRequest(new { Message = "User deletion failed." });
     }
 });
+
+
 
 
 

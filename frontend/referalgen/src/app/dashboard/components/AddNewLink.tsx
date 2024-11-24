@@ -1,19 +1,19 @@
 'use client';
 import React, { useState } from 'react';
 import SearchCompanies from './SearchCompanies';
-import {Company} from '../../types/types'
+import {Company, Link} from '../../types/types'
 
 
 interface AddNewLinkProps {
   onClose: () => void;
-  onAddLink: (newLink: any) => void;
+  onAddLink: (newLink: Link) => void;
   companies: Company[];
 }
 
 function AddNewLink({ onClose, onAddLink, companies }: AddNewLinkProps) {
-  const [linkData, setLinkData] = useState({
+  const [linkData, setLinkData] = useState<Link>({
     uid: '',
-    owner: '',
+    owner: 'Test',
     companyName: '',
     productName: '',
     country: '',
@@ -21,6 +21,8 @@ function AddNewLink({ onClose, onAddLink, companies }: AddNewLinkProps) {
     refLink: '',
     seen: 0,
     used: 0,
+    created: new Date(), // Current date and time in UTC
+    updated: new Date(), // Current date and time in UTC
   });
 
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);

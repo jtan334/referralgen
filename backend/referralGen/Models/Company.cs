@@ -11,5 +11,7 @@ namespace referralGen.models
 
     required public string Country {get;set;}
 
+    required public string Approval {get;set;}
+
  }   
 }
