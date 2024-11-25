@@ -27,7 +27,7 @@ const ServiceSelector = () => {
         </>
       );
     } else if (selectedHeading === 'My Links') {
-      return <UserLinks links={links} companies={companies} />;
+      return <UserLinks loadedLinks={links} companies={companies} refresh={fetchUserLinks} />;
     } else {
       return <p>Select a Service</p>;
     }
@@ -41,7 +41,7 @@ const ServiceSelector = () => {
 
   const fetchCompanies = async () => {
     const response = await fetch(`/api/company/`);
-    if (!response.ok) throw new Error('Failed to get company links');
+    if (!response.ok) throw new Error('Failed to get companies');
     return response.json();
   };
 

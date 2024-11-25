@@ -3,44 +3,24 @@ import AddNewLink from "./components/AddNewLink"; // Import the AddNewLink compo
 import { Link, Company } from "../types/types";
 
 interface UserLinksProps {
+  loadedLinks: Link[];
   companies: Company[];
+  refresh: (userId: string) => Promise<Link[]>;
 }
 
-function UserLinks({ companies }: UserLinksProps) {
-  const [links, setLinks] = useState<Link[]>([]); // State to store the links
+function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
+  const [links, setLinks] = useState<Link[]>(loadedLinks); // State to store the links
   const [showAddLink, setShowAddLink] = useState(false); // State to manage the AddNewLink visibility
 
-  // Fetch links initially when the component mounts
-  useEffect(() => {
-    const fetchLinks = async () => {
+    // Refresh links using the passed refresh method
+    const refreshLinks = async () => {
       try {
-        const response = await fetch(`/api/user/?userId=test`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch links");
-        }
-        const data = await response.json();
-        setLinks(data); // Set the fetched data to the state
+        const updatedLinks = await refresh("test");
+        setLinks(updatedLinks);
       } catch (error) {
         console.error(error);
       }
     };
-
-    fetchLinks();
-  }, []); // Only run once on mount
-
-  // Fetch and refresh links
-  const refreshLinks = async () => {
-    try {
-      const response = await fetch(`/api/user/?userId=test`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch links");
-      }
-      const data = await response.json();
-      setLinks(data); // Update the links state after the fetch
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   // Delete link
   const deleteLink = async (linkId: string) => {
