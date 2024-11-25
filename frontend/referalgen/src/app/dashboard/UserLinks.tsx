@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import AddNewLink from "./components/AddNewLink"; // Import the AddNewLink component
+import React, { useState } from "react";
+import AddNewLink from "./components/AddNewLink";
 import { Link, Company } from "../types/types";
 
 interface UserLinksProps {
@@ -9,42 +9,37 @@ interface UserLinksProps {
 }
 
 function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
-  const [links, setLinks] = useState<Link[]>(loadedLinks); // State to store the links
-  const [showAddLink, setShowAddLink] = useState(false); // State to manage the AddNewLink visibility
+  const [links, setLinks] = useState<Link[]>(loadedLinks);
+  const [showAddLink, setShowAddLink] = useState(false);
+  const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+  const [editedLink, setEditedLink] = useState<Link | null>(null);
 
-    // Refresh links using the passed refresh method
-    const refreshLinks = async () => {
-      try {
-        const updatedLinks = await refresh("test");
-        setLinks(updatedLinks);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const refreshLinks = async () => {
+    try {
+      const updatedLinks = await refresh("test");
+      setLinks(updatedLinks);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-  // Delete link
   const deleteLink = async (linkId: string) => {
     const response = await fetch(`/api/links?id=${linkId}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
       throw new Error("Failed to delete link");
     }
 
-    await refreshLinks(); // Refresh links after deletion
+    await refreshLinks();
   };
 
-  // Activate link
   const activateLink = async (linkId: number) => {
     const response = await fetch(`/api/links?editType=activate`, {
-      method: "PATCH", // Use PATCH for activation
-      headers: {
-        "Content-Type": "application/json",
-      },
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: linkId }),
     });
 
@@ -52,16 +47,13 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
       throw new Error("Failed to activate link");
     }
 
-    await refreshLinks(); // Refresh links after activation
+    await refreshLinks();
   };
 
-  // Edit link
   const editLink = async (updatedLink: Link) => {
     const response = await fetch(`/api/links`, {
-      method: "PUT", // Use PUT for full update
-      headers: {
-        "Content-Type": "application/json",
-      },
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedLink),
     });
 
@@ -69,16 +61,15 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
       throw new Error("Failed to update link");
     }
 
-    await refreshLinks(); // Refresh links after editing
+    await refreshLinks();
+    setEditingLinkId(null); // Exit edit mode
+    setEditedLink(null); // Clear the edited link state
   };
 
-  // Add new link
   const addNewLink = async (newLink: Link) => {
     const response = await fetch(`/api/links`, {
-      method: "POST", // Use POST for adding new link
-      headers: {
-        "Content-Type": "application/json",
-      },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newLink),
     });
 
@@ -86,12 +77,40 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
       throw new Error("Failed to add new link");
     }
 
-    await refreshLinks(); // Refresh links after adding
-    setShowAddLink(false); // Hide AddNewLink after adding
+    await refreshLinks();
+    setShowAddLink(false);
   };
 
-  const handleAddLinkClick = () => {
-    setShowAddLink(true); // Show the AddNewLink component
+  const handleAddLinkClick = () => setShowAddLink(true);
+
+  const handleEditClick = (linkId: string) => {
+    setEditingLinkId(linkId);
+    const currentLink = links.find((link) => link.uid === linkId);
+    if (currentLink) {
+      setEditedLink({ ...currentLink });
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!editedLink) return;
+    setEditedLink({ ...editedLink, refLink: e.target.value });
+  };
+
+  const hasChanges = (original: Link, edited: Link): boolean => {
+    return original.refLink !== edited.refLink;
+  };
+
+  const handleSaveClick = () => {
+    if (editingLinkId && editedLink) {
+      const currentLink = links.find((link) => link.uid === editingLinkId);
+      if (currentLink && hasChanges(currentLink, editedLink)) {
+        editLink(editedLink);
+      } else {
+        // Exit edit mode without sending a request
+        setEditingLinkId(null);
+        setEditedLink(null);
+      }
+    }
   };
 
   return (
@@ -107,6 +126,7 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
               <th>Used</th>
               <th>Date Created</th>
               <th>Date Updated</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -116,14 +136,22 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
                 <td>{link.companyName}</td>
                 <td>{link.productName}</td>
                 <td>
-                  <a
-                    href={link.refLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline"
-                  >
-                    {link.refLink}
-                  </a>
+                  {editingLinkId === link.uid ? (
+                    <input
+                      value={editedLink?.refLink || ""}
+                      onChange={handleInputChange}
+                      className="border p-1"
+                    />
+                  ) : (
+                    <a
+                      href={link.refLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      {link.refLink}
+                    </a>
+                  )}
                 </td>
                 <td>{link.seen}</td>
                 <td>{link.used}</td>
@@ -141,14 +169,24 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
                     day: "2-digit",
                   })}
                 </td>
-
+                <td>{link.active ?
+                  "Active":"Inactive"}</td>
                 <td>
-                  <button
-                    className="mx-4 bg-saffron text-black rounded-md py-2 px-4 hover:bg-saffron-dark"
-                    onClick={() => editLink(link)}
-                  >
-                    Edit
-                  </button>
+                  {editingLinkId === link.uid ? (
+                    <button
+                      className="mx-4 bg-green-500 text-black rounded-md py-2 px-4 hover:bg-green-600"
+                      onClick={handleSaveClick}
+                    >
+                      Save
+                    </button>
+                  ) : (
+                    <button
+                      className="mx-4 bg-saffron text-black rounded-md py-2 px-4 hover:bg-saffron-dark"
+                      onClick={() => handleEditClick(link.uid)}
+                    >
+                      Edit
+                    </button>
+                  )}
                   <button
                     className="bg-red-300 text-black rounded-md py-2 px-4 hover:bg-red-400"
                     onClick={() => deleteLink(link.uid)}
@@ -174,7 +212,7 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
         <AddNewLink
           onClose={() => setShowAddLink(false)}
           onAddLink={addNewLink}
-          companies={companies} // Pass the companies correctly here
+          companies={companies}
         />
       )}
     </div>
