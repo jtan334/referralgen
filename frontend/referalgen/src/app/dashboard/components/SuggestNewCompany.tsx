@@ -1,65 +1,93 @@
-'use client'
 import React, { useState } from 'react';
+import {Company} from '../../types/types'
 
-const SuggestNewCompany = () => {
-  const [company, setCompany] = useState('');
-  const [name, setName] = useState('');
-  const [referralLink, setReferralLink] = useState('');
+const SuggestNewCompany = ({ onClose }: { onClose: () => void }) => {
+  const [formData, setFormData] = useState<Company>({
+    idCompanies: 0,
+    companyName: '',
+    productName: '',
+    linkFormat: '',
+    country: '',
+    approval: ''
+  });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Process the form submission (e.g., send data to backend)
-    console.log({ company, name, referralLink });
-    // Clear the form or reset the state if needed
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/company', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to submit new company request: ${errorText}`);
+      }
+
+      alert('Request submitted successfully!');
+      onClose();
+    } catch (error) {
+      console.error(error);
+      alert('Failed to submit the request.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="p-4 bg-gray-100 rounded-md">
-      <h2 className="text-lg font-bold mb-4 text-black">Suggest New Company and Product</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="company" className="block text-sm font-medium text-gray ">Company</label>
-          <input
-            type="text"
-            id="company"
-            className="mt-1 p-2 border border-gray-300 rounded-md w-full bg-white"
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray">Product Name</label>
-          <input
-            type="text"
-            id="name"
-            className="mt-1 p-2 border border-gray-300 rounded-md w-full bg-white"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="referralLink" className="block text-sm font-medium text-gray">Referral Link</label>
-          <input
-            type="url"
-            id="referralLink"
-            className="mt-1 p-2 border border-gray-300 rounded-md w-full bg-white"
-            value={referralLink}
-            onChange={(e) => setReferralLink(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="flex justify-end space-x-2">
-          <button type="submit" className="btn btn-primary">
-            Submit
-          </button>
-        </div>
-      </form>
-    </div>
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col items-center p-4 border border-gray-300 rounded"
+    >
+      <input
+        type="text"
+        name="companyName"
+        placeholder="Company Name"
+        value={formData.companyName}
+        onChange={handleChange}
+        className="mb-4 p-2 border border-gray-300 rounded w-full text-black bg-white placeholder-gray-400"
+        required
+      />
+      <input
+        type="text"
+        name="productName"
+        placeholder="Product Name"
+        value={formData.productName}
+        onChange={handleChange}
+        className="mb-4 p-2 border border-gray-300 rounded w-full text-black bg-white placeholder-gray-400"
+        required
+      />
+      <input
+        type="url"
+        name="linkFormat"
+        placeholder="Link Format (e.g., https://example.com/{ref})"
+        value={formData.linkFormat}
+        onChange={handleChange}
+        className="mb-4 p-2 border border-gray-300 rounded w-full text-black bg-white placeholder-gray-400"
+        required
+      />
+      <input
+        type="text"
+        name="country"
+        placeholder="Country"
+        value={formData.country}
+        onChange={handleChange}
+        className="mb-4 p-2 border border-gray-300 rounded w-full text-black bg-white placeholder-gray-400"
+        required
+      />
+      <button type="submit" className="btn btn-primary w-full" disabled={loading}>
+        {loading ? 'Submitting...' : 'Submit'}
+      </button>
+    </form>
   );
 };
 

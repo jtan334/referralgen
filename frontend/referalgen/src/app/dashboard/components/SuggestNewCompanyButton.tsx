@@ -14,9 +14,7 @@ const SuggestNewCompanyButton = () => {
       <button className="btn btn-primary mb-4" onClick={handleNewCompany}>
         {showNewCompany ? 'Close' : 'Request New Company and Product'}
       </button>
-      {showNewCompany && (
-        <SuggestNewCompany />
-      )}
+      {showNewCompany && <SuggestNewCompany onClose={() => setShowNewCompany(false)} />}
     </div>
   );
 };

@@ -18,6 +18,7 @@ export interface Link {
     productName: string;
     linkFormat: string;
     country: string;
+    approval: string;
   }
 
   export interface User {
