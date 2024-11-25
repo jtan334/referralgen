@@ -1,7 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import {Company} from '../../types/types'
-
+import { Company } from '../../types/types';
 
 interface SearchCompaniesProps {
   companies: Company[]; // Receives the companies list from the parent
@@ -26,10 +25,12 @@ const SearchCompanies = ({ companies, onSelectCompany }: SearchCompaniesProps) =
     const filtered = companies.filter(company => {
       const normalizedCompanyName = company.companyName.replace(/\s+/g, '').toLowerCase();
       const normalizedProductName = company.productName.replace(/\s+/g, '').toLowerCase();
-      
+
+      // Filter for companies with approval = "approved" and match search term
       return (
-        normalizedCompanyName.includes(normalizedValue) ||
-        normalizedProductName.includes(normalizedValue)
+        company.approval === 'approved' && // Check if the company is approved
+        (normalizedCompanyName.includes(normalizedValue) ||
+          normalizedProductName.includes(normalizedValue))
       );
     });
 
@@ -54,12 +55,12 @@ const SearchCompanies = ({ companies, onSelectCompany }: SearchCompaniesProps) =
           className="input input-bordered w-full max-w-x focus:ring-0 focus:border bg-white text-gray text-xl"
         />
       </div>
-     
+
       {filteredCompanies.length > 0 && (
         <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 shadow-lg rounded-md">
           {filteredCompanies.map(company => (
-            <li 
-              key={company.idCompanies} 
+            <li
+              key={company.idCompanies}
               className="px-4 py-2 text-slate-500 text-lg cursor-pointer hover:bg-slate-200"
               onClick={() => handleCompanyClick(company)}
             >
