@@ -191,7 +191,7 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
                     className="bg-red-300 text-black rounded-md py-2 px-4 hover:bg-red-400"
                     onClick={() => deleteLink(link.uid)}
                   >
-                    Delete
+                    Deactivate
                   </button>
                 </td>
               </tr>
