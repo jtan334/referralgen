@@ -104,4 +104,46 @@ public class CompanyRepo
 
     return $"Company with ID {companyId} approved successfully.";
 }
+
+public async Task<string> EditCompany(Company company)
+{
+    using var connection = _dbConnection.CreateConnection();
+
+    try
+    {
+        string sql = @"
+            UPDATE Companies
+            SET CompanyName = @CompanyName, 
+                ProductName = @ProductName,
+                Country = @Country,
+                LinkFormat = @LinkFormat
+            WHERE idcompanies = @Id";
+
+        // Parameters to map the updated values
+        var parameters = new
+        {
+            CompanyName = company.CompanyName,
+            ProductName = company.ProductName,
+            Country = company.Country,
+            LinkFormat = company.LinkFormat,
+            Id = company.IdCompanies
+        };
+
+        // Execute the SQL query
+        int rowsAffected = await connection.ExecuteAsync(sql, parameters);
+
+        // Check if the update was successful
+        return rowsAffected > 0
+            ? "Company updated successfully."
+            : "Update failed. No rows were affected. Please check the Company ID.";
+    }
+    catch (Exception ex)
+    {
+        // Log the exception (if logging is configured)
+        // _logger.LogError(ex, "Error updating company");
+        return $"An error occurred: {ex.Message}";
+    }
+}
+
+
 }

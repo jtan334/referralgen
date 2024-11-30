@@ -9,87 +9,87 @@ public class LinkRepo(DatabaseConnection dbConnection)
 
     private readonly DatabaseConnection _dbConnection = dbConnection;
 
-   public async Task<string> AddNewLink(Link newLink)
-{
-    using var connection = _dbConnection.CreateConnection();
+    public async Task<string> AddNewLink(Link newLink)
+    {
+        using var connection = _dbConnection.CreateConnection();
 
-    string getRefLinkFormat = "SELECT linkFormat FROM companies WHERE companyName = @CompanyName AND productName = @ProductName AND country = @Country";
+        string getRefLinkFormat = "SELECT linkFormat FROM companies WHERE companyName = @CompanyName AND productName = @ProductName AND country = @Country";
 
-    var refLinkFormat = await connection.ExecuteScalarAsync<string>(
-        getRefLinkFormat,
-        new
+        var refLinkFormat = await connection.ExecuteScalarAsync<string>(
+            getRefLinkFormat,
+            new
+            {
+                CompanyName = newLink.CompanyName,
+                ProductName = newLink.ProductName,
+                Country = newLink.Country
+            }
+        );
+
+        if (string.IsNullOrEmpty(refLinkFormat))
         {
-            CompanyName = newLink.CompanyName,
-            ProductName = newLink.ProductName,
-            Country = newLink.Country
+            throw new Exception("Link format not found for the provided inputs.");
         }
-    );
 
-    if (string.IsNullOrEmpty(refLinkFormat))
-    {
-        throw new Exception("Link format not found for the provided inputs.");
-    }
+        // Replace domain in user's link
+        try
+        {
+            Uri refLinkUri = new Uri(refLinkFormat);
+            Uri userLinkUri = new Uri(newLink.RefLink);
 
-    // Replace domain in user's link
-   try
-{
-    Uri refLinkUri = new Uri(refLinkFormat);
-    Uri userLinkUri = new Uri(newLink.RefLink);
+            // Validate the domain
+            if (refLinkUri.Host != userLinkUri.Host)
+            {
+                throw new Exception("Invalid or untrusted domain in refLinkFormat.");
+            }
 
-    // Validate the domain
-    if (refLinkUri.Host != userLinkUri.Host)
-    {
-        throw new Exception("Invalid or untrusted domain in refLinkFormat.");
-    }
+            // Enforce HTTPS
+            if (refLinkUri.Scheme != "https")
+            {
+                throw new Exception("Insecure protocol detected in refLinkFormat.");
+            }
 
-    // Enforce HTTPS
-    if (refLinkUri.Scheme != "https")
-    {
-        throw new Exception("Insecure protocol detected in refLinkFormat.");
-    }
-
-    // Construct the new link
-    string updatedLink = $"{refLinkUri.Scheme}://{refLinkUri.Host}{userLinkUri.PathAndQuery}";
-    newLink.RefLink = updatedLink; // Update the user's link
-}
-catch (UriFormatException)
-{
-    throw new Exception("Invalid link format provided.");
-}
+            // Construct the new link
+            string updatedLink = $"{refLinkUri.Scheme}://{refLinkUri.Host}{userLinkUri.PathAndQuery}";
+            newLink.RefLink = updatedLink; // Update the user's link
+        }
+        catch (UriFormatException)
+        {
+            throw new Exception("Invalid link format provided.");
+        }
 
 
-    string checkSql = "SELECT COUNT(*) FROM links WHERE RefLink = @RefLink;";
-    var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { RefLink = newLink.RefLink });
+        string checkSql = "SELECT COUNT(*) FROM links WHERE RefLink = @RefLink;";
+        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { RefLink = newLink.RefLink });
 
-    if (exists > 0)
-    {
-        return "The RefLink is not unique.";
-    }
+        if (exists > 0)
+        {
+            return "The RefLink is not unique.";
+        }
 
-    // Generate a new UUID for the UID
-    newLink.UID = Guid.NewGuid().ToString();
+        // Generate a new UUID for the UID
+        newLink.UID = Guid.NewGuid().ToString();
 
-    string sql = @"
+        string sql = @"
     INSERT INTO links (UID, RefLink, Owner, Used, Seen, CompanyName, ProductName, Country, Active, Created, Updated)
     VALUES (@UID, @RefLink, @Owner, @Used, @Seen, @CompanyName, @ProductName, @Country, @Active, @Created, @Updated);";
 
-    await connection.ExecuteAsync(sql, new
-    {
-        UID = newLink.UID,
-        RefLink = newLink.RefLink,
-        Owner = newLink.Owner,
-        Used = newLink.Used,
-        Seen = newLink.Seen,
-        CompanyName = newLink.CompanyName,
-        ProductName = newLink.ProductName,
-        Country = newLink.Country,
-        Active = newLink.Active,
-        Created = DateTime.UtcNow,
-        Updated = DateTime.UtcNow
-    });
+        await connection.ExecuteAsync(sql, new
+        {
+            UID = newLink.UID,
+            RefLink = newLink.RefLink,
+            Owner = newLink.Owner,
+            Used = newLink.Used,
+            Seen = newLink.Seen,
+            CompanyName = newLink.CompanyName,
+            ProductName = newLink.ProductName,
+            Country = newLink.Country,
+            Active = newLink.Active,
+            Created = DateTime.UtcNow,
+            Updated = DateTime.UtcNow
+        });
 
-    return $"Link created successfully: {newLink.RefLink}";
-}
+        return $"Link created successfully: {newLink.RefLink}";
+    }
 
 
     public async Task<List<Link>> GetLink(string UID)

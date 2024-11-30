@@ -226,6 +226,22 @@ app.MapDelete("users/delete/{userId}", async(UsersRepo usersRepo, string userId)
     }
 });
 
+app.MapPut("company/edit", async (CompanyRepo companiesRepo, Company updatedCompany) =>
+{
+
+    var result = await companiesRepo.EditCompany(updatedCompany);
+
+    if (result.Contains("successfully"))
+    {
+        return Results.Ok(new { Message = result });
+    }
+    else
+    {
+        return Results.BadRequest(new { Message = result });
+    }
+});
+
+
 
 
 
