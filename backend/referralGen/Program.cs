@@ -241,6 +241,54 @@ app.MapPut("company/edit", async (CompanyRepo companiesRepo, Company updatedComp
     }
 });
 
+app.MapPost("reports/add", async (ReportsRepo reportsRepo, string linkId, string reportType, string reporterUid) =>
+{
+    try
+    {
+        await reportsRepo.AddReportAsync(linkId, reportType, reporterUid);
+        return Results.Ok(new { Message = "Report added successfully." });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Message = "Failed to add report.", Error = ex.Message });
+    }
+});
+
+app.MapGet("reports/get/{linkId}", async (ReportsRepo reportsRepo, string linkId) =>
+{
+    try
+    {
+        var reports = await reportsRepo.GetReportsAsync(linkId);
+
+        if (reports.ReportTypeToReporters.Any())
+        {
+            return Results.Ok(reports);
+        }
+        else
+        {
+            return Results.NotFound(new { Message = "No reports found for the given link ID." });
+        }
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Message = "Failed to retrieve reports.", Error = ex.Message });
+    }
+});
+
+app.MapDelete("reports/delete/{linkId}", async (ReportsRepo reportsRepo, string linkId) =>
+{
+    try
+    {
+        await reportsRepo.DeleteReportsAsync(linkId);
+        return Results.Ok(new { Message = "Reports deleted successfully." });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Message = "Failed to delete reports.", Error = ex.Message });
+    }
+});
+
+
 
 
 

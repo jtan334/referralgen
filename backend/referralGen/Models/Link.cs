@@ -1,4 +1,3 @@
-using Google.Protobuf.WellKnownTypes;
 
 namespace referralGen.models
 {
