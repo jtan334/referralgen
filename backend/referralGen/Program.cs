@@ -26,6 +26,7 @@ builder.Services.AddSingleton(new DatabaseConnection(connectionString));
 builder.Services.AddTransient<UsersRepo>();
 builder.Services.AddTransient<CompanyRepo>();
 builder.Services.AddTransient<LinkRepo>();
+builder.Services.AddTransient<ReportsRepo>();
 
 
 builder.Services.AddEndpointsApiExplorer();
