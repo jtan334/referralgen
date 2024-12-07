@@ -158,6 +158,18 @@ app.MapPatch ("links/update/seen", async(LinkRepo linkRepo,string id) =>
     }
 });
 
+app.MapPatch ("links/update/used", async(LinkRepo linkRepo,string id) =>
+{
+    try{
+        var result = await linkRepo.AddUsedAsync(id);
+        return Results.Ok(result);
+    }
+    catch(Exception ex)
+    {
+        return Results.BadRequest(ex);
+    }
+});
+
 
 app.MapPost ("company/add", async(CompanyRepo companyRepo, Company company)=>
 {

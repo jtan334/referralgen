@@ -222,6 +222,38 @@ public class LinkRepo(DatabaseConnection dbConnection)
         }
     }
 
+    public async Task<string> AddUsedAsync(string UID)
+    {
+        using var connection = _dbConnection.CreateConnection();
+
+        // Check if the link exists
+        string checkSql = "SELECT COUNT(*) FROM links WHERE UID = @UID;";
+        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { UID });
+
+        if (exists == 0)
+        {
+            return "The link does not exist."; // Return error if link is not found
+        }
+
+        // Increment the Used count
+        string updateSql = @"
+        UPDATE links
+        SET Used = Used + 1
+        WHERE UID = @UID;";
+
+        int rowsAffected = await connection.ExecuteAsync(updateSql, new { UID });
+
+        // Confirm if the Seen count was incremented
+        if (rowsAffected > 0)
+        {
+            return "Used count updated successfully.";
+        }
+        else
+        {
+            return "Failed to update the Used count.";
+        }
+    }
+
 
 
 
