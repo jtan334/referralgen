@@ -38,7 +38,9 @@ export const useLinkGeneration = (company: Company | null) => {
         if (a.seen !== b.seen) return a.seen - b.seen;
         return new Date(a.updated).getTime() - new Date(b.updated).getTime();
       });
-      const selected = sortedLinks[0] || null;
+      const selected = sortedLinks.shift() || null; // Remove the first link
+      cache.current[cacheKey] = sortedLinks; // Update cache
+
       setSelectedLink(selected);
       setShowLink(true);
 
