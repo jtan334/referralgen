@@ -191,36 +191,21 @@ public class LinkRepo(DatabaseConnection dbConnection)
 
 
     public async Task<string> AddSeenAsync(string UID)
-    {
-        using var connection = _dbConnection.CreateConnection();
+{
+    using var connection = _dbConnection.CreateConnection();
 
-        // Check if the link exists
-        string checkSql = "SELECT COUNT(*) FROM links WHERE UID = @UID;";
-        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { UID });
-
-        if (exists == 0)
-        {
-            return "The link does not exist."; // Return error if link is not found
-        }
-
-        // Increment the Seen count
-        string updateSql = @"
+    // Perform the update and return the affected row count
+    string sql = @"
         UPDATE links
         SET Seen = Seen + 1
-        WHERE UID = @UID;";
+        WHERE UID = @UID;
 
-        int rowsAffected = await connection.ExecuteAsync(updateSql, new { UID });
+        SELECT ROW_COUNT();";
 
-        // Confirm if the Seen count was incremented
-        if (rowsAffected > 0)
-        {
-            return "Seen count updated successfully.";
-        }
-        else
-        {
-            return "Failed to update the Seen count.";
-        }
-    }
+    var rowsAffected = await connection.ExecuteScalarAsync<int>(sql, new { UID });
+    return $"Updated seen count for{UID}";
+}
+
 
     public async Task<string> AddUsedAsync(string UID)
     {

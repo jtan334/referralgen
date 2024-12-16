@@ -5,23 +5,23 @@ export async function PATCH(req: Request) {
 
   try {
     // Parse the request body
-    const { id, incrementBy = 1 } = await req.json();
+    const body = await req.json();
+    const linkId = body.id;
 
     // Validate input
-    if (!id || typeof incrementBy !== 'number') {
+    if (!linkId) {
       return NextResponse.json(
-        { error: 'Invalid input: ID is required and incrementBy must be a number' },
+        { error: 'Invalid input: ID is required' },
         { status: 400 }
       );
     }
 
-    // Make a PATCH request to the backend API
-    const response = await fetch(`${apiUrl}/links/update/seen`, {
+    // Make a PATCH request to the backend API with id as a query parameter
+    const response = await fetch(`${apiUrl}/links/update/seen?id=${encodeURIComponent(linkId)}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id, incrementBy }),
     });
 
     // Check for API response errors

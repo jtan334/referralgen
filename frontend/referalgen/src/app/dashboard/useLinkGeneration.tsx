@@ -8,14 +8,14 @@ export const useLinkGeneration = (company: Company | null) => {
   // Cache for previously fetched links by company and product combination
   const cache = useRef<Record<string, Link[]>>({});
 
-  const updateSeenCount = async (id: string, incrementBy: number = 1) => {
+  const updateSeenCount = async (id: string) => {
     try {
-      const response = await fetch(`/api/links/update/seen`, {
+      const response = await fetch(`/api/links/update`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id, incrementBy }),
+        body: JSON.stringify({ id:id }),
       });
       if (!response.ok) {
         throw new Error(`Failed to update seen count for link ${id}`);
@@ -45,8 +45,12 @@ export const useLinkGeneration = (company: Company | null) => {
       setShowLink(true);
 
       // Update seen count if a link is selected
-      if (selected) await updateSeenCount(selected.uid);
-      return;
+      if (selected){
+        console.log(selected.uid) 
+        
+        await updateSeenCount(selected.uid);
+      
+      } return;
     }
 
     try {
