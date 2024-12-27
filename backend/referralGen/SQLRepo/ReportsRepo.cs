@@ -3,14 +3,10 @@ using referralGen.Models;
 
 namespace referralGen.SQLRepo
 {
-    public class ReportsRepo
+    public class ReportsRepo(DatabaseConnection dbConnection)
     {
-        private readonly DatabaseConnection _dbConnection;
-
-        public ReportsRepo(DatabaseConnection dbConnection)
-        {
-            _dbConnection = dbConnection;
-        }
+        private readonly DatabaseConnection _dbConnection = dbConnection;
+       
 
         // Add a new report
         public async Task AddReportAsync(string linkId, string reportType, string reporterUid)

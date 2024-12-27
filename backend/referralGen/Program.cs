@@ -215,7 +215,7 @@ app.MapPatch("/company/{id}/approve", async (CompanyRepo companyRepo, int id) =>
 app.MapPost("users/add", async(UsersRepo usersRepo, Users user)=>
 {
 
-    var res = await usersRepo.CreateNewUser(user);
+    var res = await usersRepo.CreateNewUser(user); 
 
     if (res != null){
         
