@@ -9,87 +9,154 @@ public class LinkRepo(DatabaseConnection dbConnection)
 
     private readonly DatabaseConnection _dbConnection = dbConnection;
 
-    public async Task<string> AddNewLink(Link newLink)
+   public async Task<string> AddNewLink(Link newLink)
+{
+    using var connection = _dbConnection.CreateConnection();
+
+    string getRefLinkFormat = "SELECT linkFormat FROM companies WHERE companyName = @CompanyName AND productName = @ProductName AND country = @Country";
+
+    var refLinkFormat = await connection.ExecuteScalarAsync<string>(
+        getRefLinkFormat,
+        new
+        {
+            CompanyName = newLink.CompanyName,
+            ProductName = newLink.ProductName,
+            Country = newLink.Country
+        }
+    );
+
+    if (string.IsNullOrEmpty(refLinkFormat))
     {
-        using var connection = _dbConnection.CreateConnection();
+        throw new Exception("Link format not found for the provided inputs.");
+    }
 
-        string getRefLinkFormat = "SELECT linkFormat FROM companies WHERE companyName = @CompanyName AND productName = @ProductName AND country = @Country";
+    // Clean up the links for comparison
+    string cleanRefFormat = CleanUrl(refLinkFormat);
+    string cleanUserLink = CleanUrl(newLink.RefLink);
 
-        var refLinkFormat = await connection.ExecuteScalarAsync<string>(
-            getRefLinkFormat,
-            new
-            {
-                CompanyName = newLink.CompanyName,
-                ProductName = newLink.ProductName,
-                Country = newLink.Country
-            }
-        );
+    // Extract base domain and path from reference format
+    string refDomain = GetDomainPart(cleanRefFormat);
+    string refPath = GetPathPart(cleanRefFormat);
 
-        if (string.IsNullOrEmpty(refLinkFormat))
-        {
-            throw new Exception("Link format not found for the provided inputs.");
-        }
+    // If user input doesn't contain the domain, add it
+    if (!cleanUserLink.StartsWith(refDomain, StringComparison.OrdinalIgnoreCase))
+    {
+        cleanUserLink = refDomain + "/" + cleanUserLink.TrimStart('/');
+    }
 
-        // Replace domain in user's link
-        try
-        {
-            Uri refLinkUri = new Uri(refLinkFormat);
-            Uri userLinkUri = new Uri(newLink.RefLink);
+    // Extract user's domain and path
+    string userDomain = GetDomainPart(cleanUserLink);
+    string userPath = GetPathPart(cleanUserLink);
 
-            // Validate the domain
-            if (refLinkUri.Host != userLinkUri.Host)
-            {
-                throw new Exception("Invalid or untrusted domain in refLinkFormat.");
-            }
+    // Validate domain
+    if (!userDomain.Equals(refDomain, StringComparison.OrdinalIgnoreCase))
+    {
+        throw new Exception($"Invalid domain. Expected domain format: {refDomain}");
+    }
 
-            // Enforce HTTPS
-            if (refLinkUri.Scheme != "https")
-            {
-                throw new Exception("Insecure protocol detected in refLinkFormat.");
-            }
+    // Validate that the user's path starts with the reference path
+    if (!userPath.StartsWith(refPath, StringComparison.OrdinalIgnoreCase))
+    {
+        // If user's path doesn't include the reference path, add it
+        userPath = refPath.TrimEnd('/') + "/" + userPath.TrimStart('/');
+        cleanUserLink = userDomain + userPath;
+    }
 
-            // Construct the new link
-            string updatedLink = $"{refLinkUri.Scheme}://{refLinkUri.Host}{userLinkUri.PathAndQuery}";
-            newLink.RefLink = updatedLink; // Update the user's link
-        }
-        catch (UriFormatException)
-        {
-            throw new Exception("Invalid link format provided.");
-        }
+    // Update the newLink.RefLink with the properly formatted URL
+    newLink.RefLink = cleanUserLink;
+    
+    string checkPathSql = @"
+        SELECT COUNT(*) 
+        FROM links 
+        WHERE CompanyName = @CompanyName 
+        AND ProductName = @ProductName 
+        AND Country = @Country 
+        AND RefLink LIKE @PathPattern;";
 
-
-        string checkSql = "SELECT COUNT(*) FROM links WHERE RefLink = @RefLink;";
-        var exists = await connection.ExecuteScalarAsync<int>(checkSql, new { RefLink = newLink.RefLink });
-
-        if (exists > 0)
-        {
-            return "The RefLink is not unique.";
-        }
-
-        // Generate a new UUID for the UID
-        newLink.UID = Guid.NewGuid().ToString();
-
-        string sql = @"
-    INSERT INTO links (UID, RefLink, Owner, Used, Seen, CompanyName, ProductName, Country, Active, Created, Updated)
-    VALUES (@UID, @RefLink, @Owner, @Used, @Seen, @CompanyName, @ProductName, @Country, @Active, @Created, @Updated);";
-
-        await connection.ExecuteAsync(sql, new
-        {
-            UID = newLink.UID,
-            RefLink = newLink.RefLink,
-            Owner = newLink.Owner,
-            Used = newLink.Used,
-            Seen = newLink.Seen,
+    var pathExists = await connection.ExecuteScalarAsync<int>(
+        checkPathSql,
+        new { 
             CompanyName = newLink.CompanyName,
             ProductName = newLink.ProductName,
             Country = newLink.Country,
-            Active = newLink.Active,
-            Created = DateTime.UtcNow,
-            Updated = DateTime.UtcNow
+            PathPattern = $"%{userPath}"
         });
 
-        return $"Link created successfully: {newLink.RefLink}";
+    if (pathExists > 0)
+    {
+        throw new Exception("This path is already in use. Please provide a unique path.");
     }
+
+    newLink.UID = Guid.NewGuid().ToString();
+
+    string sql = @"
+        INSERT INTO links (
+            UID, RefLink, Owner, Used, Seen, CompanyName, 
+            ProductName, Country, Active, Created, Updated
+        )
+        VALUES (
+            @UID, @RefLink, @Owner, @Used, @Seen, @CompanyName,
+            @ProductName, @Country, @Active, @Created, @Updated
+        );";
+
+    await connection.ExecuteAsync(sql, new
+    {
+        UID = newLink.UID,
+        RefLink = newLink.RefLink,
+        Owner = newLink.Owner,
+        Used = newLink.Used,
+        Seen = newLink.Seen,
+        CompanyName = newLink.CompanyName,
+        ProductName = newLink.ProductName,
+        Country = newLink.Country,
+        Active = newLink.Active,
+        Created = DateTime.UtcNow,
+        Updated = DateTime.UtcNow
+    });
+
+    return $"Link created successfully: {newLink.RefLink}";
+}
+
+private string CleanUrl(string url)
+{
+    if (string.IsNullOrEmpty(url))
+    {
+        return "";
+    }
+
+    // Remove http://, https://, and www.
+    url = url.ToLower()
+        .Replace("https://", "")
+        .Replace("http://", "")
+        .Replace("www.", "");
+    
+    // Remove trailing slash if present
+    return url.TrimEnd('/');
+}
+
+private string GetDomainPart(string cleanUrl)
+{
+    if (string.IsNullOrEmpty(cleanUrl))
+    {
+        return "";
+    }
+    
+    // Get everything before the first slash
+    int slashIndex = cleanUrl.IndexOf('/');
+    return slashIndex < 0 ? cleanUrl : cleanUrl.Substring(0, slashIndex);
+}
+
+private string GetPathPart(string cleanUrl)
+{
+    if (string.IsNullOrEmpty(cleanUrl))
+    {
+        return "";
+    }
+    
+    // Get everything after the first slash
+    int slashIndex = cleanUrl.IndexOf('/');
+    return slashIndex < 0 ? "" : cleanUrl.Substring(slashIndex);
+}
 
 
     public async Task<List<Link>> GetLink(string UID)
