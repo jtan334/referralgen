@@ -117,11 +117,11 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
     <div className="w-full p-4">
     {links.length > 0 ? (
       <div className="overflow-x-auto">
-        <table className="table table-zebra w-full">
+        <table className="table w-full">
           <thead>
-            <tr className="text-base">
-              <th className="hidden md:table-cell">Company</th>
-              <th className="hidden md:table-cell">Product</th>
+            <tr className="text-base bg-transparent">
+              <th className="hidden lg:table-cell">Company</th>
+              <th className="hidden lg:table-cell">Product</th>
               <th>Link</th>
               <th className="hidden lg:table-cell">Seen</th>
               <th className="hidden lg:table-cell">Used</th>
@@ -133,10 +133,13 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
           </thead>
           <tbody>
             {links.map((link) => (
-              <tr key={link.uid} className="hover">
-                <td className="hidden md:table-cell">{link.companyName}</td>
-                <td className="hidden md:table-cell">{link.productName}</td>
-                <td className="max-w-xs overflow-hidden text-ellipsis">
+              <tr 
+                key={link.uid} 
+                className="bg-transparent transition-all duration-200 ease-in-out hover:bg-gray-100 hover:text-black"
+              >
+                <td className="table-cell transition-colors duration-200">{link.companyName}</td>
+                <td className="table-cell transition-colors duration-200">{link.productName}</td>
+                <td className="max-w-xs overflow-hidden text-ellipsis transition-colors duration-200">
                   {editingLinkId === link.uid ? (
                     <input
                       value={editedLink?.refLink || ""}
@@ -154,20 +157,20 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
                     </a>
                   )}
                 </td>
-                <td className="hidden lg:table-cell">{link.seen}</td>
-                <td className="hidden lg:table-cell">{link.used}</td>
-                <td className="hidden xl:table-cell">
+                <td className="hidden lg:table-cell transition-colors duration-200">{link.seen}</td>
+                <td className="hidden lg:table-cell transition-colors duration-200">{link.used}</td>
+                <td className="hidden xl:table-cell transition-colors duration-200">
                   {new Date(link.created + "Z").toLocaleDateString()}
                 </td>
-                <td className="hidden xl:table-cell">
+                <td className="hidden xl:table-cell transition-colors duration-200">
                   {new Date(link.updated + "Z").toLocaleDateString()}
                 </td>
-                <td>
+                <td className="transition-colors duration-200">
                   <div className={`badge ${link.active ? 'badge-success' : 'badge-error'}`}>
                     {link.active ? "Active" : "Inactive"}
                   </div>
                 </td>
-                <td>
+                <td className="transition-colors duration-200">
                   <div className="flex flex-col md:flex-row gap-2">
                     {editingLinkId === link.uid ? (
                       <button
@@ -213,7 +216,6 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
         </button>
       )}
     </div>
-
     {showAddLink && (
       <AddNewLink
         onClose={() => setShowAddLink(false)}
