@@ -141,14 +141,14 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
                     <input
                       value={editedLink?.refLink || ""}
                       onChange={handleInputChange}
-                      className="input input-bordered w-full max-w-xs"
+                      className="input input-bordered w-full max-w-xs bg-white text-black"
                     />
                   ) : (
                     <a
-                      href={link.refLink}
+                      href={`//${link.refLink}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="link link-primary"
+                      className="link link-primary text-black"
                     >
                       {link.refLink}
                     </a>
@@ -213,15 +213,7 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
         </button>
       )}
     </div>
-
-    {showAddLink && (
-      <AddNewLink
-        onClose={() => setShowAddLink(false)}
-        onAddLink={addNewLink}
-        companies={companies}
-      />
-    )}
-  </div>
+</div>
   );
 }
 
