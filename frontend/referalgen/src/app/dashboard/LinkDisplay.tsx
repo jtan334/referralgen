@@ -56,12 +56,12 @@ const LinkDisplay = ({ selectedLink }: LinkDisplayProps) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="card bg-base-100 w-full max-w-md shadow-xl">
             <div className="card-body">
-              <h2 className="card-title">Link Details</h2>
+              <h2 className="card-title">Here is your link for {selectedLink.companyName}-{selectedLink.productName}!</h2>
               
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-medium mb-1">Referral Link:</h3>
-                  <p className="text-sm opacity-70">{selectedLink.refLink}</p>
+                  <h3 className="text-lg mb-1">Referral Link:</h3>
+                  <a href={selectedLink.refLink} className="text-lg underline text-blue-600 hover:text-blue-800 visited:text-purple-600">{selectedLink.refLink}</a>
                 </div>
                 
                 <div>
@@ -100,15 +100,17 @@ const LinkDisplay = ({ selectedLink }: LinkDisplayProps) => {
                 {/* Render report options if 'No' is selected */}
                 {usedLink === false && (
                   <div className="form-control">
-                    <h3 className="font-medium mb-2">Report Type:</h3>
+                    <h3 className="font-medium mb-2">What was the reason?</h3>
                     <select 
                       className="select select-bordered w-full"
                       value={reportType}
                       onChange={(e) => setReportType(e.target.value)}
                     >
                       <option value="none">Select a report type</option>
-                      <option value="spam">Spam</option>
-                      <option value="inappropriate">Inappropriate</option>
+                      <option value="invalid">Invalid Link/404 Not Found</option>
+                      <option value="wrong">Wrong Link</option>
+                      <option value = "expired">Expired Link</option>
+                      <option value="changed">Changed My Mind</option>
                       <option value="other">Other</option>
                     </select>
                   </div>

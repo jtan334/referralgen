@@ -117,11 +117,11 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
     <div className="w-full p-4">
     {links.length > 0 ? (
       <div className="overflow-x-auto">
-        <table className="table table-zebra w-full">
+        <table className="table w-full">
           <thead>
-            <tr className="text-base">
-              <th className="hidden md:table-cell">Company</th>
-              <th className="hidden md:table-cell">Product</th>
+            <tr className="text-xl font-bold text-black">
+              <th className="table-cell">Company</th>
+              <th className="table-cell">Product</th>
               <th>Link</th>
               <th className="hidden lg:table-cell">Seen</th>
               <th className="hidden lg:table-cell">Used</th>
@@ -133,7 +133,7 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
           </thead>
           <tbody>
             {links.map((link) => (
-              <tr key={link.uid} className="hover">
+              <tr key={link.uid} className="text-base text-black">
                 <td className="hidden md:table-cell">{link.companyName}</td>
                 <td className="hidden md:table-cell">{link.productName}</td>
                 <td className="max-w-xs overflow-hidden text-ellipsis">
@@ -163,7 +163,7 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
                   {new Date(link.updated + "Z").toLocaleDateString()}
                 </td>
                 <td>
-                  <div className={`badge ${link.active ? 'badge-success' : 'badge-error'}`}>
+                  <div className={`badge ${link.active ? 'badge-success' : 'badge-error'} text-bold text-lg`} >
                     {link.active ? "Active" : "Inactive"}
                   </div>
                 </td>
@@ -178,7 +178,7 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
                       </button>
                     ) : (
                       <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm bg-saffron"
                         onClick={() => handleEditClick(link.uid)}
                       >
                         Edit
