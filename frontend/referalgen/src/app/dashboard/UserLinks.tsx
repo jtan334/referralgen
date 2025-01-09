@@ -120,11 +120,11 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
         <table className="table w-full">
           <thead>
             <tr className="text-xl font-bold text-black">
-              <th className="table-cell">Company</th>
-              <th className="table-cell">Product</th>
+              <th className="hidden lg:table-cell">Company</th>
+              <th className="hidden lg:table-cell">Product</th>
               <th>Link</th>
-              <th className="hidden lg:table-cell">Seen</th>
-              <th className="hidden lg:table-cell">Used</th>
+              <th className="lg:table-cell">Seen</th>
+              <th className="table-cell">Used</th>
               <th className="hidden xl:table-cell">Created</th>
               <th className="hidden xl:table-cell">Updated</th>
               <th>Status</th>
@@ -154,8 +154,8 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
                     </a>
                   )}
                 </td>
-                <td className="hidden lg:table-cell">{link.seen}</td>
-                <td className="hidden lg:table-cell">{link.used}</td>
+                <td className="lg:table-cell">{link.seen}</td>
+                <td className="lg:table-cell">{link.used}</td>
                 <td className="hidden xl:table-cell">
                   {new Date(link.created + "Z").toLocaleDateString()}
                 </td>
