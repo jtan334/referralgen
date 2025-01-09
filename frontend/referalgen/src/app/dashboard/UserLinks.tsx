@@ -119,9 +119,9 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
       <div className="overflow-x-auto">
         <table className="table w-full">
           <thead>
-            <tr className="text-base bg-transparent">
-              <th className="hidden lg:table-cell">Company</th>
-              <th className="hidden lg:table-cell">Product</th>
+            <tr className="text-base bg-transparent text-black">
+              <th className="table-cell">Company</th>
+              <th className="table-cell">Product</th>
               <th>Link</th>
               <th className="hidden lg:table-cell">Seen</th>
               <th className="hidden lg:table-cell">Used</th>
@@ -135,42 +135,42 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
             {links.map((link) => (
               <tr 
                 key={link.uid} 
-                className="bg-transparent transition-all duration-200 ease-in-out hover:bg-gray-100 hover:text-black"
+                className="bg-transparent text-black"
               >
-                <td className="table-cell transition-colors duration-200">{link.companyName}</td>
-                <td className="table-cell transition-colors duration-200">{link.productName}</td>
-                <td className="max-w-xs overflow-hidden text-ellipsis transition-colors duration-200">
+                <td className="table-cell">{link.companyName}</td>
+                <td className="table-cell">{link.productName}</td>
+                <td className="max-w-xs overflow-hidden text-ellipsis">
                   {editingLinkId === link.uid ? (
                     <input
                       value={editedLink?.refLink || ""}
                       onChange={handleInputChange}
-                      className="input input-bordered w-full max-w-xs"
+                      className="input input-bordered w-full max-w-xs bg-white text-black"
                     />
                   ) : (
                     <a
-                      href={link.refLink}
+                      href={`//${link.refLink}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="link link-primary"
+                      className="link link-primary text-black"
                     >
                       {link.refLink}
                     </a>
                   )}
                 </td>
-                <td className="hidden lg:table-cell transition-colors duration-200">{link.seen}</td>
-                <td className="hidden lg:table-cell transition-colors duration-200">{link.used}</td>
-                <td className="hidden xl:table-cell transition-colors duration-200">
+                <td className="hidden lg:table-cell">{link.seen}</td>
+                <td className="hidden lg:table-cell">{link.used}</td>
+                <td className="hidden xl:table-cell">
                   {new Date(link.created + "Z").toLocaleDateString()}
                 </td>
-                <td className="hidden xl:table-cell transition-colors duration-200">
+                <td className="hidden xl:table-cell">
                   {new Date(link.updated + "Z").toLocaleDateString()}
                 </td>
-                <td className="transition-colors duration-200">
+                <td>
                   <div className={`badge ${link.active ? 'badge-success' : 'badge-error'}`}>
                     {link.active ? "Active" : "Inactive"}
                   </div>
                 </td>
-                <td className="transition-colors duration-200">
+                <td>
                   <div className="flex flex-col md:flex-row gap-2">
                     {editingLinkId === link.uid ? (
                       <button
@@ -216,14 +216,7 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
         </button>
       )}
     </div>
-    {showAddLink && (
-      <AddNewLink
-        onClose={() => setShowAddLink(false)}
-        onAddLink={addNewLink}
-        companies={companies}
-      />
-    )}
-  </div>
+</div>
   );
 }
 
