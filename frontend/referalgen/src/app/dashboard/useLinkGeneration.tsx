@@ -15,7 +15,9 @@ export const useLinkGeneration = (company: Company | null) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id:id }),
+        body: JSON.stringify({ id:id,
+          updateType: 'seen'
+         }),
       });
       if (!response.ok) {
         throw new Error(`Failed to update seen count for link ${id}`);
