@@ -62,23 +62,24 @@ const LinkDisplay = ({ selectedLink, currentUserUid }: LinkDisplayProps) => {
         resetState();
       } else {
         const reportData:Report = {
-          LinkId: selectedLink.uid,
+          linkId: selectedLink.uid,
           reportType: reportType,
-          ReporrterUid: currentUserUid,
+          ReporterUid: currentUserUid
         };
-
-        console.log('Report submitted:', reportData);
-        // Report endpoint implementation pending
         const response = await fetch('/api/reports', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            
-           
-          })
+          body: JSON.stringify(reportData)
         });
+
+        const result = await response.json();
+
+
+        console.log('Report submitted:', result);
+       
+       
         resetState();
       }
     } catch (error) {

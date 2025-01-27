@@ -43,7 +43,7 @@ const SelectedCompany = ({ company }: SelectedCompanyProps) => {
         </button>
       </div>
 
-      {showLink && <LinkDisplay selectedLink={selectedLink} />}
+      {showLink && <LinkDisplay selectedLink={selectedLink} currentUserUid=''/>}
     </div>
   );
 };

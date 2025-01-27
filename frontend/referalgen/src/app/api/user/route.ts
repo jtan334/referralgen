@@ -79,7 +79,7 @@ export async function DELETE(request: Request) {
 
   try {
     const response = await fetch(`${apiUrl}/users/delete/${userId}`, {
-      method: 'POST', // Assuming your backend uses POST for delete
+      method: 'DELETE', 
       headers: {
         'Content-Type': 'application/json',
       },
