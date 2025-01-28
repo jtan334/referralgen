@@ -1,29 +1,69 @@
 namespace referralGen.Models
 {
+    public class Report
+    {
+        public string ReporterUid { get; set; }
+        public string ReportType { get; set; }
+        public DateTime Timestamp { get; set; }
+
+        public Report(string reporterUid, string reportType)
+        {
+            ReporterUid = reporterUid;
+            ReportType = reportType;
+            Timestamp = DateTime.UtcNow;
+        }
+    }
+
     public class Reports
     {
         required public string LinkId { get; set; }
 
-        public Dictionary<string, List<string>> ReportTypeToReporters { get; set; }
+        // Changed to store Report objects instead of just reporter UIDs
+        public Dictionary<string, List<Report>> ReportTypeToReports { get; set; }
 
-        public int NumberReports { get; private set; } // Private setter to prevent external manipulation
+        public int NumberReports { get; private set; }
 
         public Reports()
         {
-            ReportTypeToReporters = new Dictionary<string, List<string>>();
+            ReportTypeToReports = [];
             NumberReports = 0;
         }
 
-        // Method to add a report
         public void AddReport(string reportType, string reporterUid)
         {
-            if (!ReportTypeToReporters.ContainsKey(reportType))
+            var report = new Report(reporterUid, reportType);
+
+            if (!ReportTypeToReports.TryGetValue(reportType, out List<Report>? value))
             {
-                ReportTypeToReporters[reportType] = new List<string>();
+                value = [];
+                ReportTypeToReports[reportType] = value;
             }
 
-            ReportTypeToReporters[reportType].Add(reporterUid);
-            NumberReports++; // Update count whenever a new report is added
+            value.Add(report);
+            NumberReports++;
+        }
+
+        // New methods for timestamp-based operations
+        public IEnumerable<Report> GetReportsByTimeRange(DateTime start, DateTime end)
+        {
+            return ReportTypeToReports
+                .SelectMany(x => x.Value)
+                .Where(report => report.Timestamp >= start && report.Timestamp <= end);
+        }
+
+        public Dictionary<string, int> GetReportCountsByType()
+        {
+            return ReportTypeToReports.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Count
+            );
+        }
+
+        public IEnumerable<IGrouping<DateTime, Report>> GetReportsByDay()
+        {
+            return ReportTypeToReports
+                .SelectMany(x => x.Value)
+                .GroupBy(report => report.Timestamp.Date);
         }
     }
 }

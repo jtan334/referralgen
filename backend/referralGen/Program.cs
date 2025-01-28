@@ -273,13 +273,34 @@ app.MapGet("reports/get/{linkId}", async (ReportsRepo reportsRepo, string linkId
     {
         var reports = await reportsRepo.GetReportsAsync(linkId);
 
-        if (reports.ReportTypeToReporters.Any())
+        if (reports.ReportTypeToReports.Any()) // Corrected property name
         {
             return Results.Ok(reports);
         }
         else
         {
             return Results.NotFound(new { Message = "No reports found for the given link ID." });
+        }
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Message = "Failed to retrieve reports.", Error = ex.Message });
+    }
+});
+
+app.MapGet("/reports/all", async (ReportsRepo reportsRepo) =>
+{
+    try
+    {
+        var reports = await reportsRepo.GetAllReportsAsync();
+
+        if (reports.Count != 0)
+        {
+            return Results.Ok(reports);
+        }
+        else
+        {
+            return Results.NotFound(new { Message = "No reports found." });
         }
     }
     catch (Exception ex)
