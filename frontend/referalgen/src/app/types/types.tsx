@@ -27,8 +27,9 @@ export interface Link {
   }
   
   export interface Report {
-    ReporterUid: string;
+    reporterUid: string;
     linkId: string;
     reportType: string;
+    timestamp?: Date;
     
   }

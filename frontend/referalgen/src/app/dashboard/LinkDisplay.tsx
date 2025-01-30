@@ -64,8 +64,11 @@ const LinkDisplay = ({ selectedLink, currentUserUid }: LinkDisplayProps) => {
         const reportData:Report = {
           linkId: selectedLink.uid,
           reportType: reportType,
-          ReporterUid: currentUserUid
+          reporterUid: currentUserUid,
         };
+        console.log('Report data:', reportData);
+        console.log('Report Type:', reportType);
+        console.log('Reporter UID:', currentUserUid);  
         const response = await fetch('/api/reports', {
           method: 'POST',
           headers: {
