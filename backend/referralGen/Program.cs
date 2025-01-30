@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Models;
 using referralGen.SQLRepo; 
 using dotenv.net;
 using referralGen.models;
+using referralGen.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,7 @@ builder.Services.AddSingleton(new DatabaseConnection(connectionString));
 builder.Services.AddTransient<UsersRepo>();
 builder.Services.AddTransient<CompanyRepo>();
 builder.Services.AddTransient<LinkRepo>();
-builder.Services.AddTransient<ReportsRepo>();
+builder.Services.AddTransient<ReportRepo>();
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -254,26 +255,13 @@ app.MapPut("company/edit", async (CompanyRepo companiesRepo, Company updatedComp
     }
 });
 
-app.MapPost("reports/add", async (ReportsRepo reportsRepo, string linkId, string reportType, string reporterUid) =>
-{
-    try
-    {
-        await reportsRepo.AddReportAsync(linkId, reportType, reporterUid);
-        return Results.Ok(new { Message = "Report added successfully." });
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new { Message = "Failed to add report.", Error = ex.Message });
-    }
-});
-
-app.MapGet("reports/get/{linkId}", async (ReportsRepo reportsRepo, string linkId) =>
+app.MapGet("reports/get/{linkId}", async (ReportRepo reportsRepo, string linkId) =>
 {
     try
     {
         var reports = await reportsRepo.GetReportsAsync(linkId);
 
-        if (reports.ReportTypeToReports.Any()) // Corrected property name
+        if (reports.Any()) // Check if there are any reports
         {
             return Results.Ok(reports);
         }
@@ -288,13 +276,13 @@ app.MapGet("reports/get/{linkId}", async (ReportsRepo reportsRepo, string linkId
     }
 });
 
-app.MapGet("/reports/all", async (ReportsRepo reportsRepo) =>
+app.MapGet("/reports/all", async (ReportRepo reportsRepo) =>
 {
     try
     {
         var reports = await reportsRepo.GetAllReportsAsync();
 
-        if (reports.Count != 0)
+        if (reports.Any()) // Check if there are any reports
         {
             return Results.Ok(reports);
         }
@@ -309,7 +297,28 @@ app.MapGet("/reports/all", async (ReportsRepo reportsRepo) =>
     }
 });
 
-app.MapDelete("reports/delete/{linkId}", async (ReportsRepo reportsRepo, string linkId) =>
+app.MapPost("reports/add", async (ReportRepo reportsRepo, Report report) =>
+{
+    try
+    {
+        if (report == null || string.IsNullOrEmpty(report.LinkId) || string.IsNullOrEmpty(report.ReportType) || string.IsNullOrEmpty(report.ReporterUid))
+        {
+            return Results.BadRequest(new { Message = "Invalid request data." });
+        }
+
+        // Set the timestamp to the current time
+        report.Timestamp = DateTime.UtcNow;
+
+        await reportsRepo.AddReportAsync(report);
+        return Results.Ok(new { Message = "Report added successfully." });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Message = "Failed to add report.", Error = ex.Message });
+    }
+});
+
+app.MapDelete("reports/delete/{linkId}", async (ReportRepo reportsRepo, string linkId) =>
 {
     try
     {
@@ -321,7 +330,6 @@ app.MapDelete("reports/delete/{linkId}", async (ReportsRepo reportsRepo, string 
         return Results.BadRequest(new { Message = "Failed to delete reports.", Error = ex.Message });
     }
 });
-
 
 
 
