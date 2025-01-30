@@ -255,6 +255,7 @@ app.MapPut("company/edit", async (CompanyRepo companiesRepo, Company updatedComp
     }
 });
 
+
 app.MapGet("reports/get/{linkId}", async (ReportRepo reportsRepo, string linkId) =>
 {
     try
@@ -276,13 +277,14 @@ app.MapGet("reports/get/{linkId}", async (ReportRepo reportsRepo, string linkId)
     }
 });
 
-app.MapGet("/reports/all", async (ReportRepo reportsRepo) =>
+// Removed the leading forward slash
+app.MapGet("reports/all", async (ReportRepo reportsRepo) =>
 {
     try
     {
         var reports = await reportsRepo.GetAllReportsAsync();
 
-        if (reports.Any()) // Check if there are any reports
+        if (reports.Count != 0) // Check if there are any reports
         {
             return Results.Ok(reports);
         }

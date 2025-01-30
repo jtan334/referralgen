@@ -1,10 +1,10 @@
 namespace referralGen.Models
 {
-    public class Report(string linkId, string reporterUid, string reportType)
+    public class Report
     {
-        public string LinkId { get; set; } = linkId;
-        public string ReporterUid { get; set; } = reporterUid;
-        public string ReportType { get; set; } = reportType;
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public required string LinkId { get; set; } 
+        public required string ReporterUid { get; set; } 
+        public required string ReportType { get; set; } 
+        public DateTime Timestamp { get; set; } 
     }
 }

@@ -13,25 +13,28 @@ namespace referralGen.SQLRepo
         }
 
         // Add a new report
-        public async System.Threading.Tasks.Task AddReportAsync(Report report)
-        {
-            using var connection = _dbConnection.CreateConnection();
+        public async Task AddReportAsync(Report report)
+{
+    using var connection = _dbConnection.CreateConnection();
 
-            string sql = @"
-                INSERT INTO Reports (LinkId, ReportType, ReporterUid, Timestamp)
-                VALUES (@LinkId, @ReportType, @ReporterUid, @Timestamp);";
+    string sql = @"
+        INSERT INTO Reports (LinkId, ReportType, ReporterUid, Timestamp)
+        VALUES (@LinkId, @ReportType, @ReporterUid, @Timestamp);";
 
-            await connection.ExecuteAsync(sql, new
-            {
-                report.LinkId,
-                report.ReportType,
-                report.ReporterUid,
-                report.Timestamp
-            });
-        }
+    report.Timestamp = DateTime.UtcNow;
+    var parameters = new
+    {
+        report.LinkId,
+        report.ReportType,
+        report.ReporterUid,
+        report.Timestamp
+    };
+
+    await connection.ExecuteAsync(sql, parameters);
+}
 
         // Get all reports
-        public async System.Threading.Tasks.Task<System.Collections.Generic.List<Report>> GetAllReportsAsync()
+        public async Task<List<Report>> GetAllReportsAsync()
         {
             using var connection = _dbConnection.CreateConnection();
 
@@ -41,11 +44,11 @@ namespace referralGen.SQLRepo
 
             var reportData = await connection.QueryAsync<Report>(sql);
 
-            return new System.Collections.Generic.List<Report>(reportData);
+            return [.. reportData];
         }
 
         // Get all reports for a specific linkId
-        public async System.Threading.Tasks.Task<System.Collections.Generic.List<Report>> GetReportsAsync(string linkId)
+        public async Task<List<Report>> GetReportsAsync(string linkId)
         {
             using var connection = _dbConnection.CreateConnection();
 
@@ -59,11 +62,11 @@ namespace referralGen.SQLRepo
                 new { LinkId = linkId }
             );
 
-            return new System.Collections.Generic.List<Report>(reportData);
+            return [.. reportData];
         }
 
         // Get reports within a date range
-        public async System.Threading.Tasks.Task<System.Collections.Generic.List<Report>> GetReportsInTimeRangeAsync(string linkId, System.DateTime startDate, System.DateTime endDate)
+        public async Task<List<Report>> GetReportsInTimeRangeAsync(string linkId, DateTime startDate, DateTime endDate)
         {
             using var connection = _dbConnection.CreateConnection();
 
@@ -83,11 +86,11 @@ namespace referralGen.SQLRepo
                 }
             );
 
-            return new System.Collections.Generic.List<Report>(reportData);
+            return [.. reportData];
         }
 
         // Delete all reports for a specific linkId
-        public async System.Threading.Tasks.Task DeleteReportsAsync(string linkId)
+        public async Task DeleteReportsAsync(string linkId)
         {
             using var connection = _dbConnection.CreateConnection();
 
