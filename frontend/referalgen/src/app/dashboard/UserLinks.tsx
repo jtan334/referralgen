@@ -62,8 +62,8 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
     }
 
     await refreshLinks();
-    setEditingLinkId(null); // Exit edit mode
-    setEditedLink(null); // Clear the edited link state
+    setEditingLinkId(null);
+    setEditedLink(null);
   };
 
   const addNewLink = async (newLink: Link) => {
@@ -80,8 +80,6 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
     await refreshLinks();
     setShowAddLink(false);
   };
-
-  const handleAddLinkClick = () => setShowAddLink(true);
 
   const handleEditClick = (linkId: string) => {
     setEditingLinkId(linkId);
@@ -106,7 +104,6 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
       if (currentLink && hasChanges(currentLink, editedLink)) {
         editLink(editedLink);
       } else {
-        // Exit edit mode without sending a request
         setEditingLinkId(null);
         setEditedLink(null);
       }
@@ -115,105 +112,115 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
 
   return (
     <div className="w-full p-4">
-    {links.length > 0 ? (
-      <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead>
-            <tr className="text-xl font-bold text-black">
-              <th className="hidden lg:table-cell">Company</th>
-              <th className="hidden lg:table-cell">Product</th>
-              <th>Link</th>
-              <th className="lg:table-cell">Seen</th>
-              <th className="table-cell">Used</th>
-              <th className="hidden xl:table-cell">Created</th>
-              <th className="hidden xl:table-cell">Updated</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {links.map((link) => (
-              <tr key={link.uid} className="text-base text-black">
-                <td className="hidden md:table-cell">{link.companyName}</td>
-                <td className="hidden md:table-cell">{link.productName}</td>
-                <td className="max-w-xs overflow-hidden text-ellipsis">
-                  {editingLinkId === link.uid ? (
-                    <input
-                      value={editedLink?.refLink || ""}
-                      onChange={handleInputChange}
-                      className="input input-bordered w-full max-w-xs bg-white text-black"
-                    />
-                  ) : (
-                    <a
-                      href={`//${link.refLink}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link link-primary text-black"
-                    >
-                      {link.refLink}
-                    </a>
-                  )}
-                </td>
-                <td className="lg:table-cell">{link.seen}</td>
-                <td className="lg:table-cell">{link.used}</td>
-                <td className="hidden xl:table-cell">
-                  {new Date(link.created + "Z").toLocaleDateString()}
-                </td>
-                <td className="hidden xl:table-cell">
-                  {new Date(link.updated + "Z").toLocaleDateString()}
-                </td>
-                <td>
-                  <div className={`badge ${link.active ? 'badge-success' : 'badge-error'} text-bold text-lg`} >
-                    {link.active ? "Active" : "Inactive"}
-                  </div>
-                </td>
-                <td>
-                  <div className="flex flex-col md:flex-row gap-2">
-                    {editingLinkId === link.uid ? (
-                      <button
-                        className="btn btn-success btn-sm"
-                        onClick={handleSaveClick}
-                      >
-                        Save
-                      </button>
-                    ) : (
-                      <button
-                        className="btn btn-primary btn-sm bg-saffron"
-                        onClick={() => handleEditClick(link.uid)}
-                      >
-                        Edit
-                      </button>
-                    )}
-                    <button
-                      className="btn btn-error btn-sm"
-                      onClick={() => deleteLink(link.uid)}
-                    >
-                      Deactivate
-                    </button>
-                  </div>
-                </td>
+     
+      {links.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="table w-full">
+            <thead>
+              <tr className="text-xl font-bold text-black">
+                <th className="hidden lg:table-cell">Company</th>
+                <th className="hidden lg:table-cell">Product</th>
+                <th>Link</th>
+                <th className="lg:table-cell">Seen</th>
+                <th className="table-cell">Used</th>
+                <th className="hidden xl:table-cell">Created</th>
+                <th className="hidden xl:table-cell">Updated</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    ) : (
-      <div className="text-center py-8">
-        <p className="text-lg">You don't have any links yet!</p>
-      </div>
-    )}
-    
-    <div className="flex justify-center mt-8">
-      {!showAddLink && (
-        <button 
-          className="btn btn-primary"
-          onClick={() => setShowAddLink(true)}
-        >
-          Add New Link
-        </button>
+            </thead>
+            <tbody>
+              {links.map((link) => (
+                <tr key={link.uid} className="text-base text-black">
+                  <td className="hidden md:table-cell">{link.companyName}</td>
+                  <td className="hidden md:table-cell">{link.productName}</td>
+                  <td className="max-w-xs overflow-hidden text-ellipsis">
+                    {editingLinkId === link.uid ? (
+                      <input
+                        value={editedLink?.refLink || ""}
+                        onChange={handleInputChange}
+                        className="input input-bordered w-full max-w-xs bg-white text-black"
+                      />
+                    ) : (
+                      <a
+                        href={`//${link.refLink}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link link-primary text-black"
+                      >
+                        {link.refLink}
+                      </a>
+                    )}
+                  </td>
+                  <td className="lg:table-cell">{link.seen}</td>
+                  <td className="lg:table-cell">{link.used}</td>
+                  <td className="hidden xl:table-cell">
+                    {new Date(link.created + "Z").toLocaleDateString()}
+                  </td>
+                  <td className="hidden xl:table-cell">
+                    {new Date(link.updated + "Z").toLocaleDateString()}
+                  </td>
+                  <td>
+                    <div className={`badge ${link.active ? 'badge-success' : 'badge-error'} text-bold text-lg`}>
+                      {link.active ? "Active" : "Inactive"}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="flex flex-col md:flex-row gap-2">
+                      {editingLinkId === link.uid ? (
+                        <button
+                          className="btn btn-success btn-sm"
+                          onClick={handleSaveClick}
+                        >
+                          Save
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-primary btn-sm bg-saffron"
+                          onClick={() => handleEditClick(link.uid)}
+                        >
+                          Edit
+                        </button>
+                      )}
+                      <button
+                        className="btn btn-error btn-sm"
+                        onClick={() => deleteLink(link.uid)}
+                      >
+                        Deactivate
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+           {/* Add New Link section */}
+      {showAddLink ? (
+        <div className="mb-8">
+          <AddNewLink
+            companies={companies}
+            onClose={() => setShowAddLink(false)}
+            onAddLink={addNewLink}
+          />
+        </div>
+      ) : (
+        <div className="flex justify-center mb-8">
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowAddLink(true)}
+          >
+            Add New Link
+          </button>
+        </div>
+      )}
+
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-lg">You don't have any links yet!</p>
+        </div>
       )}
     </div>
-</div>
   );
 }
 
