@@ -107,7 +107,7 @@ const LinkDisplay = ({ selectedLink, currentUserUid }: LinkDisplayProps) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="card bg-base-100 w-full max-w-md shadow-xl">
             <div className="card-body">
-              <h2 className="card-title">Here is your link for {selectedLink.companyName}-{selectedLink.productName}!</h2>
+              <h2 className="card-title text-center my-3">Here is your link for {selectedLink.companyName}-{selectedLink.productName}!</h2>
               
               <div className="space-y-4">
                 <div>

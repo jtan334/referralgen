@@ -1,11 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useLinkGeneration } from './useLinkGeneration'; // Custom hook for link generation logic
-import LinkDisplay from './LinkDisplay'; // Component to display selected link
+import { useLinkGeneration } from './useLinkGeneration';
+import LinkDisplay from './LinkDisplay';
 import {Company} from '../types/types'
-
-
-
 
 interface SelectedCompanyProps {
   company: Company | null;
@@ -17,23 +14,24 @@ const SelectedCompany = ({ company }: SelectedCompanyProps) => {
 
   useEffect(() => {
     if (company) {
-      setVisible(true); // Reset visibility when a new company is selected
+      setVisible(true);
     }
   }, [company]);
 
   const handleClear = () => {
-    setVisible(false); // Hide the component when 'X' is clicked
+    setVisible(false);
   };
 
   if (!visible || !company) return null;
 
   return (
-    <div className="my-10 mx-10 py-5 px-5 border rounded bg-customwhite relative">
+    <div className="my-10 mx-10 py-5 px-5 bg-customwhite relative shadow-[0_0_10px_rgba(0,0,0,0.1)]">
+      {/* Changed shadow class to use a custom uniform shadow */}
       <button
-        className="absolute top-2 right-2 text-xl text-black hover:text-gray-700"
+        className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center text-2xl font-bold text-gray-600 hover:text-gray-900 transition-colors duration-200 rounded-full hover:bg-gray-100"
         onClick={handleClear}
       >
-        X
+        ×
       </button>
       <h2 className="text-xl font-bold text-black">{company.companyName}</h2>
       <p className="text-lg">{company.productName}</p>

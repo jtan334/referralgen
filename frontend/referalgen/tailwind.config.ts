@@ -27,5 +27,18 @@ const config: Config = {
     },
   },
   plugins: [require('daisyui'),],
+  daisyui: {  // Add this configuration
+    themes: [
+      {
+        mytheme: {  // You can name this whatever you want
+          primary: "#007EA7",    // Using your cerulean color
+          secondary: "#E8C547",  // saffron
+          accent: "#A27E8E",     // mpink
+          neutral: "#3a506b",    // ymblue
+          "base-100": "#e6eaef", // customwhite
+        },
+      },
+    ],
+  },
 };
 export default config;

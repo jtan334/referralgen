@@ -176,7 +176,7 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
                         </button>
                       ) : (
                         <button
-                          className="btn btn-primary btn-sm bg-saffron"
+                          className="btn text-black btn-primary btn-sm bg-saffron"
                           onClick={() => handleEditClick(link.uid)}
                         >
                           Edit
