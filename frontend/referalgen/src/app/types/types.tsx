@@ -24,6 +24,8 @@ export interface Link {
   export interface User {
     uid: string;
     name: string; 
+    email: string;
+    photoURL: string;
   }
   
   export interface Report {
@@ -32,4 +34,13 @@ export interface Link {
     reportType: string;
     timestamp?: Date;
     
+  }
+
+  export interface AuthContextType {
+    user: User | null;
+    loading: boolean;
+    error: Error | null;
+    login: () => Promise<void>;
+    logout: () => Promise<void>;
+    isAuthenticated: boolean;
   }

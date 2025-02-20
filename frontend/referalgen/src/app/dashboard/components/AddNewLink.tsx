@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import SearchCompanies from './SearchCompanies';
 import {Company, Link} from '../../types/types'
+import { useAuth } from '@/app/firebase/AuthContext';
 
 
 interface AddNewLinkProps {
@@ -11,9 +12,10 @@ interface AddNewLinkProps {
 }
 
 function AddNewLink({ onClose, onAddLink, companies }: AddNewLinkProps) {
+  const {user} = useAuth();
   const [linkData, setLinkData] = useState<Link>({
     uid: '',
-    owner: 'Test',
+    owner: user?.uid || '',
     companyName: '',
     productName: '',
     country: '',

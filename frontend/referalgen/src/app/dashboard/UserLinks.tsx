@@ -112,7 +112,26 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
 
   return (
     <div className="w-full p-4">
-     
+      {/* Add New Link section */}
+      {showAddLink ? (
+        <div className="mb-8">
+          <AddNewLink
+            companies={companies}
+            onClose={() => setShowAddLink(false)}
+            onAddLink={addNewLink}
+          />
+        </div>
+      ) : (
+        <div className="flex justify-center mb-8">
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowAddLink(true)}
+          >
+            Add New Link
+          </button>
+        </div>
+      )}
+  
       {links.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="table w-full">
@@ -194,26 +213,6 @@ function UserLinks({ companies, loadedLinks, refresh }: UserLinksProps) {
               ))}
             </tbody>
           </table>
-           {/* Add New Link section */}
-      {showAddLink ? (
-        <div className="mb-8">
-          <AddNewLink
-            companies={companies}
-            onClose={() => setShowAddLink(false)}
-            onAddLink={addNewLink}
-          />
-        </div>
-      ) : (
-        <div className="flex justify-center mb-8">
-          <button 
-            className="btn btn-primary"
-            onClick={() => setShowAddLink(true)}
-          >
-            Add New Link
-          </button>
-        </div>
-      )}
-
         </div>
       ) : (
         <div className="text-center py-8">

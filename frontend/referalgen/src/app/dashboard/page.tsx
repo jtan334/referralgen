@@ -4,6 +4,7 @@ import Footer from '../components/Footer'
 import Header from '../components/Header'
 import ServiceSelector from './ServiceSelector'
 import SuggestNewCompanyButton from './components/SuggestNewCompanyButton'
+import { AuthProvider } from '../firebase/AuthContext'
 
 
 const page = () => {
@@ -11,7 +12,8 @@ const page = () => {
   
 
   return (
-    
+    <AuthProvider>
+
     <div className="flex flex-col h-screen justify-between">
       <Header/>
       <ServiceSelector/>
@@ -24,6 +26,7 @@ const page = () => {
       </div>
       <Footer/>
     </div>
+    </AuthProvider>
   )
 }
 

@@ -4,8 +4,10 @@ import SearchCompanies from './components/SearchCompanies';
 import UserLinks from './UserLinks';
 import SelectedCompany from './SelectedCompany';
 import {Link, Company} from '../types/types'
+import { useAuth } from '../firebase/AuthContext';
 
 const ServiceSelector = () => {
+  const { user } = useAuth();
   const [selectedHeading, setSelectedHeading] = useState<string>('My Links');
   const [links, setLinks] = useState<Link[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -34,7 +36,8 @@ const ServiceSelector = () => {
   };
 
   const fetchUserLinks = async (userId: string) => {
-    const response = await fetch(`/api/user/?userId=${userId}`);
+    if (!user) return;
+    const response = await fetch(`/api/user/?userId=${user.uid}`);
     if (!response.ok) throw new Error('Failed to fetch user links');
     return response.json();
   };
