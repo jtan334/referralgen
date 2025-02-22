@@ -10,7 +10,7 @@ const SuggestNewCompanyButton = () => {
   };
 
   return (
-    <div className="flex justify-center items-center flex-col mt-4">
+    <div className="flex justify-center items-center flex-col">
       <button className="btn btn-primary mb-4" onClick={handleNewCompany}>
         {showNewCompany ? 'Close' : 'Request New Company and Product'}
       </button>
