@@ -5,7 +5,6 @@ import { useAuth } from "../firebase/AuthContext";
 
 const Header = () => {
   const { user } = useAuth();
-  console.log(user?.photoURL);
   return (
     <div className="navbar bg-ymblue sticky top-0 z-50">
       <div className="flex-1">

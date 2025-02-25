@@ -15,7 +15,7 @@ const Landing = () => {
               <br /> Make money sharing them.
             </p>
             <Link href="#info" scroll={true}>
-              <button className="btn btn-primary text-lg bg-saffron outline-none hover:bg-ymblue hover:text-white">
+              <button className="btn btn-primary text-black text-lg bg-saffron outline-none hover:bg-ymblue hover:text-white">
                 <p>How It Works</p>
               </button>
             </Link>
@@ -77,7 +77,7 @@ const Landing = () => {
 
       <div className="flex justify-center py-6 md:py-8">
         <Link href={`/signup`}>
-          <button className="btn btn-primary text-lg bg-saffron outline-none px-6 md:px-9 hover:bg-ymblue hover:text-white">
+          <button className="btn text-black btn-primary text-lg bg-saffron outline-none px-6 md:px-9 hover:bg-ymblue hover:text-white">
             <p>Sign Up</p>
           </button>
         </Link>

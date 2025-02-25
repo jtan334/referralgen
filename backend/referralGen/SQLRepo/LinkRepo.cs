@@ -31,39 +31,32 @@ public class LinkRepo(DatabaseConnection dbConnection)
     }
 
     // Clean up the links for comparison
-    string cleanRefFormat = CleanUrl(refLinkFormat);
+   string cleanRefFormat = CleanUrl(refLinkFormat);
     string cleanUserLink = CleanUrl(newLink.RefLink);
 
     // Extract base domain and path from reference format
     string refDomain = GetDomainPart(cleanRefFormat);
     string refPath = GetPathPart(cleanRefFormat);
 
-    // If user input doesn't contain the domain, add it
-    if (!cleanUserLink.StartsWith(refDomain, StringComparison.OrdinalIgnoreCase))
+    // Extract path from user input, ignoring their domain if present
+    string userPath = "";
+    if (cleanUserLink.Contains("/"))
     {
-        cleanUserLink = refDomain + "/" + cleanUserLink.TrimStart('/');
+        // If the input contains a slash, take everything after the last slash
+        userPath = "/" + cleanUserLink.Split('/').Last();
+    }
+    else
+    {
+        // If no slash, treat the entire input as the path
+        userPath = "/" + cleanUserLink;
     }
 
-    // Extract user's domain and path
-    string userDomain = GetDomainPart(cleanUserLink);
-    string userPath = GetPathPart(cleanUserLink);
-
-    // Validate domain
-    if (!userDomain.Equals(refDomain, StringComparison.OrdinalIgnoreCase))
-    {
-        throw new Exception($"Invalid domain. Expected domain format: {refDomain}");
-    }
-
-    // Validate that the user's path starts with the reference path
-    if (!userPath.StartsWith(refPath, StringComparison.OrdinalIgnoreCase))
-    {
-        // If user's path doesn't include the reference path, add it
-        userPath = refPath.TrimEnd('/') + "/" + userPath.TrimStart('/');
-        cleanUserLink = userDomain + userPath;
-    }
+    // Construct the final URL
+    string finalUrl = refDomain + (refPath.TrimEnd('/') + "/" + userPath.TrimStart('/')).TrimEnd('/');
 
     // Update the newLink.RefLink with the properly formatted URL
-    newLink.RefLink = cleanUserLink;
+    newLink.RefLink = finalUrl;
+
     
     string checkPathSql = @"
         SELECT COUNT(*) 
@@ -124,14 +117,15 @@ private string CleanUrl(string url)
         return "";
     }
 
-    // Remove http://, https://, and www.
-    url = url.ToLower()
-        .Replace("https://", "")
-        .Replace("http://", "")
-        .Replace("www.", "");
-    
-    // Remove trailing slash if present
-    return url.TrimEnd('/');
+    // Remove any protocol prefixes
+    url = url.Replace("https://", "")
+            .Replace("http://", "")
+            .Replace("www.", "");
+
+    // Remove any trailing slashes
+    url = url.TrimEnd('/').ToLower();
+
+    return url;
 }
 
 private string GetDomainPart(string cleanUrl)
@@ -140,7 +134,7 @@ private string GetDomainPart(string cleanUrl)
     {
         return "";
     }
-    
+
     // Get everything before the first slash
     int slashIndex = cleanUrl.IndexOf('/');
     return slashIndex < 0 ? cleanUrl : cleanUrl.Substring(0, slashIndex);
@@ -152,12 +146,11 @@ private string GetPathPart(string cleanUrl)
     {
         return "";
     }
-    
+
     // Get everything after the first slash
     int slashIndex = cleanUrl.IndexOf('/');
     return slashIndex < 0 ? "" : cleanUrl.Substring(slashIndex);
 }
-
 
     public async Task<List<Link>> GetLink(string UID)
     {
