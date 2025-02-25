@@ -31,12 +31,19 @@ public class LinkRepo(DatabaseConnection dbConnection)
     }
 
     // Clean up the links for comparison
-   string cleanRefFormat = CleanUrl(refLinkFormat);
+    string cleanRefFormat = CleanUrl(refLinkFormat);
     string cleanUserLink = CleanUrl(newLink.RefLink);
 
     // Extract base domain and path from reference format
     string refDomain = GetDomainPart(cleanRefFormat);
     string refPath = GetPathPart(cleanRefFormat);
+
+    // Validate domain if user provided one
+    string userDomain = GetDomainPart(cleanUserLink);
+    if (!string.IsNullOrEmpty(userDomain) && !userDomain.Equals(refDomain, StringComparison.OrdinalIgnoreCase))
+    {
+        throw new Exception($"Invalid domain. Expected domain: {refDomain}");
+    }
 
     // Extract path from user input, ignoring their domain if present
     string userPath = "";
@@ -57,7 +64,6 @@ public class LinkRepo(DatabaseConnection dbConnection)
     // Update the newLink.RefLink with the properly formatted URL
     newLink.RefLink = finalUrl;
 
-    
     string checkPathSql = @"
         SELECT COUNT(*) 
         FROM links 
@@ -109,7 +115,6 @@ public class LinkRepo(DatabaseConnection dbConnection)
 
     return $"Link created successfully: {newLink.RefLink}";
 }
-
 private string CleanUrl(string url)
 {
     if (string.IsNullOrEmpty(url))
