@@ -27,8 +27,9 @@ function Page() {
 
   return (
     <div>
-      
-        <SignInButton /> 
+      <div className ="text-4xl text-center m-9">Sign Up or Sign In with your Google Account</div>
+        <div className="m-5 justify-self-center"><SignInButton /></div>
+         
       
     </div>
   );
