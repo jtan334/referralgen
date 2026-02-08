@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLinkGeneration } from './useLinkGeneration';
 import LinkDisplay from './LinkDisplay';
-import {Company} from '../types/types'
+import { Company } from '../types/types';
 
 interface SelectedCompanyProps {
   company: Company | null;
@@ -25,23 +25,45 @@ const SelectedCompany = ({ company }: SelectedCompanyProps) => {
   if (!visible || !company) return null;
 
   return (
-    <div className="my-10 mx-10 py-5 px-5 bg-customwhite relative shadow-[0_0_10px_rgba(0,0,0,0.1)]">
-      {/* Changed shadow class to use a custom uniform shadow */}
-      <button
-        className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center text-2xl font-bold text-gray-600 hover:text-gray-900 transition-colors duration-200 rounded-full hover:bg-gray-100"
-        onClick={handleClear}
-      >
-        ×
-      </button>
-      <h2 className="text-xl font-bold text-black">{company.companyName}</h2>
-      <p className="text-lg">{company.productName}</p>
-      <div className="flex justify-center items-center h-full">
-        <button onClick={handleGenerateLink} className="btn btn-primary mt-2 content-center">
-          Generate Link
-        </button>
-      </div>
+    <div className="my-6 mx-auto max-w-md">
+      <div className="card bg-white shadow-xl">
+        <div className="card-body">
+          {/* Close Button */}
+          <button
+            className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold transition-colors"
+            onClick={handleClear}
+            aria-label="Clear selection"
+          >
+            ×
+          </button>
 
-      {showLink && <LinkDisplay selectedLink={selectedLink} currentUserUid='string'/>}
+          {/* Company Info */}
+          <div className="mb-4">
+            <h2 className="card-title text-ymblue text-xl mb-1">
+              {company.companyName}
+            </h2>
+            <p className="text-gray text-base">{company.productName}</p>
+            <p className="text-gray-400 text-sm mt-1">{company.country}</p>
+          </div>
+
+          {/* Generate Button */}
+          <div className="card-actions justify-center mt-2">
+            <button
+              onClick={handleGenerateLink}
+              className="btn bg-cerulean hover:bg-opacity-90 text-white w-full"
+            >
+              Generate Link
+            </button>
+          </div>
+
+          {/* Link Display */}
+          {showLink && (
+            <div className="mt-4">
+              <LinkDisplay selectedLink={selectedLink} currentUserUid="string" />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

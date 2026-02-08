@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { Company } from '../../types/types';
 
 interface SearchCompaniesProps {
-  companies: Company[]; // Receives the companies list from the parent
-  onSelectCompany: (company: Company) => void; // Callback to pass the selected company to the parent
+  companies: Company[];
+  onSelectCompany: (company: Company) => void;
 }
 
 const SearchCompanies = ({ companies, onSelectCompany }: SearchCompaniesProps) => {
@@ -26,9 +26,8 @@ const SearchCompanies = ({ companies, onSelectCompany }: SearchCompaniesProps) =
       const normalizedCompanyName = company.companyName.replace(/\s+/g, '').toLowerCase();
       const normalizedProductName = company.productName.replace(/\s+/g, '').toLowerCase();
 
-      // Filter for companies with approval = "approved" and match search term
       return (
-        company.approval === 'approved' && // Check if the company is approved
+        company.approval === 'approved' &&
         (normalizedCompanyName.includes(normalizedValue) ||
           normalizedProductName.includes(normalizedValue))
       );
@@ -38,33 +37,36 @@ const SearchCompanies = ({ companies, onSelectCompany }: SearchCompaniesProps) =
   };
 
   const handleCompanyClick = (company: Company) => {
-    onSelectCompany(company); // Pass the selected company back to the parent
-    setSearchTerm(''); // Clear the search term
-    setFilteredCompanies([]); // Clear the filtered results
+    onSelectCompany(company);
+    setSearchTerm('');
+    setFilteredCompanies([]);
   };
 
   return (
-    <div className="relative my-10 mx-10 py-5 px-5">
-      <h1 className="text-2xl text-[#3E6259] font">Search Companies</h1>
-      <div className="flex">
+    <div className="relative">
+      <div className="form-control">
+        <label className="label">
+          <span className="text-2xl label-text text-gray">Search Companies</span>
+        </label>
         <input
           type="text"
-          placeholder="Type here"
+          placeholder="Search by company or product name"
           value={searchTerm}
           onChange={handleSearch}
-          className="input input-bordered w-full max-w-x focus:ring-0 focus:border bg-white text-gray text-xl"
+          className="input input-bordered w-full bg-white text-black"
         />
       </div>
 
       {filteredCompanies.length > 0 && (
-        <ul className="absolute z-10 mt-2 w-full bg-white border border-gray-300 shadow-lg rounded-md">
+        <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 shadow-lg rounded-md max-h-60 overflow-y-auto">
           {filteredCompanies.map(company => (
             <li
               key={company.idCompanies}
-              className="px-4 py-2 text-slate-500 text-lg cursor-pointer hover:bg-slate-200"
+              className="px-4 py-3 text-gray-700 cursor-pointer hover:bg-gray-100 border-b border-gray-200 last:border-b-0 transition-colors"
               onClick={() => handleCompanyClick(company)}
             >
-              {company.companyName} - {company.productName}
+              <div className="font-medium text-black">{company.companyName}</div>
+              <div className="text-sm text-gray-500">{company.productName}</div>
             </li>
           ))}
         </ul>
