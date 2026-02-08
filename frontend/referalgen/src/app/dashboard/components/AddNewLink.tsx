@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import SearchCompanies from './SearchCompanies';
 import { Company, Link } from '../../types/types';
+import { Company, Link } from '../../types/types';
 import { useAuth } from '@/app/firebase/AuthContext';
 
 interface AddNewLinkProps {
