@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "firebase": "^10.13.2",
-    "next": "^14.2.13",
+    "firebase": "^12.11.0",
+    "next": "^16.2.2",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -20,7 +20,7 @@
     "@types/react-dom": "^18.3.0",
     "daisyui": "^4.12.10",
     "eslint": "^8",
-    "eslint-config-next": "14.2.7",
+    "eslint-config-next": "^16.2.2",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
