@@ -8,6 +8,8 @@ namespace referralGen.models
 
         required public string Name { get; set; }
 
+        public string[]? Friends { get; set; }
+
 
     }
 }

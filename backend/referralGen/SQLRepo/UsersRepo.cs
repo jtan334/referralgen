@@ -33,9 +33,9 @@ namespace referralGen.SQLRepo
     try
     {
         var createNewUser = await connection.QuerySingleOrDefaultAsync<Users>(sql, new 
-        { 
-            UID = newUser.UID, 
-            Name = newUser.Name
+        {
+            newUser.UID,
+            newUser.Name
         });
 
         if (createNewUser != null)
@@ -78,6 +78,49 @@ namespace referralGen.SQLRepo
             throw new Exception("An error occurred while deleting the link.", ex);
         }
     }
-           
+
+    public async Task<string> AddFreind (string Uid)
+        {
+            using var connection = _dbConnection.CreateConnection();
+                string addFriendSql = "UPDATE users SET friends = array_append(friends, @Uid) WHERE UID = @Uid";
+                try
+                {
+                    await connection.ExecuteAsync(addFriendSql, new { Uid });
+                    return $"Successfully added friend {Uid}";
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("An error occurred while adding a friend.", ex);
+                }
+        }
+
+    public async Task<string> RemoveFriend (string Uid)
+        {
+            using var connection = _dbConnection.CreateConnection();
+                string removeFriendSql = "UPDATE users SET friends = array_remove(friends, @Uid) WHERE UID = @Uid";
+                try
+                {
+                    await connection.ExecuteAsync(removeFriendSql, new { Uid });
+                    return $"Successfully removed friend {Uid}";
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("An error occurred while removing a friend.", ex);
+                }
+        }
+    public async Task<List<Link>> GetFriendsLinksAsync(string userID)
+        {
+            using var connection = _dbConnection.CreateConnection();
+
+            string sql = @"
+                SELECT l.*
+                FROM links l
+                JOIN users u ON l.owner = ANY(u.friends)
+                WHERE u.UID = @UserId";
+
+            var friendsLinks = await connection.QueryAsync<Link>(sql, new { UserId = userID });
+
+            return friendsLinks.ToList();
+        }
     }
 }
