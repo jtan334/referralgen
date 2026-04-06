@@ -108,7 +108,16 @@ namespace referralGen.SQLRepo
                     throw new Exception("An error occurred while removing a friend.", ex);
                 }
         }
-    public async Task<List<Link>> GetFriendsLinksAsync(string userID)
+    public async Task<string[]> GetFriendsAsync(string userID)
+    {
+        using var connection = _dbConnection.CreateConnection();
+
+        string sql = "SELECT friends FROM users WHERE UID = @UserId";
+        var friends = await connection.QuerySingleOrDefaultAsync<string[]>(sql, new { UserId = userID });
+
+        return friends ?? Array.Empty<string>();
+    }
+    public async Task<List<Link>> GetAllFriendsLinksAsync(string userID)
         {
             using var connection = _dbConnection.CreateConnection();
 

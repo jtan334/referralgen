@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import SearchCompanies from './components/SearchCompanies';
 import UserLinks from './UserLinks';
 import SelectedCompany from './SelectedCompany';
-import {Link, Company} from '../types/types'
+import FriendsList from '../components/FriendsList';
+import { Link, Company } from '../types/types';
 import { useAuth } from '../firebase/AuthContext';
 
 const ServiceSelector = () => {
@@ -12,7 +13,7 @@ const ServiceSelector = () => {
   const [links, setLinks] = useState<Link[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null); // State for selected company
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 
   const renderContent = () => {
     if (selectedHeading === 'Generate Links') {
@@ -21,8 +22,8 @@ const ServiceSelector = () => {
           <SearchCompanies
             companies={companies}
             onSelectCompany={(company) => {
-              setSelectedCompany(null); // Clear current selection
-              setTimeout(() => setSelectedCompany(company), 0); // Reset selectedCompany with a new one
+              setSelectedCompany(null);
+              setTimeout(() => setSelectedCompany(company), 0);
             }}
           />
           {selectedCompany && <SelectedCompany company={selectedCompany} />}
@@ -30,6 +31,8 @@ const ServiceSelector = () => {
       );
     } else if (selectedHeading === 'My Links') {
       return <UserLinks loadedLinks={links} companies={companies} refresh={fetchUserLinks} />;
+    } else if (selectedHeading === 'Friend Links') {
+      return <FriendsList />;
     } else {
       return <p>Select a Service</p>;
     }
@@ -81,7 +84,7 @@ const ServiceSelector = () => {
           }`}
           onClick={() => {
             setSelectedHeading('Generate Links');
-            setSelectedCompany(null); // Reset selected company when switching
+            setSelectedCompany(null);
           }}
         >
           Generate Links
@@ -94,6 +97,15 @@ const ServiceSelector = () => {
           onClick={() => setSelectedHeading('My Links')}
         >
           My Links
+        </span>
+        <div className="h-8 w-px bg-gray-400"></div>
+        <span
+          className={`cursor-pointer text-4xl font-bold ${
+            selectedHeading === 'Friend Links' ? 'text-cerulean' : 'text-ymblue'
+          }`}
+          onClick={() => setSelectedHeading('Friend Links')}
+        >
+          Friend Links
         </span>
       </div>
 

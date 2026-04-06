@@ -333,6 +333,27 @@ app.MapDelete("reports/delete/{linkId}", async (ReportRepo reportsRepo, string l
     }
 });
 
+app.MapGet("users/getFriendsLinks/{userId}", async (UsersRepo usersRepo, string userId) =>
+{
+    try
+    {
+        var user = await usersRepo.GetFriendsLinksAsync(userId);
+
+        if (user != null)
+        {
+            return Results.Ok(user);
+        }
+        else
+        {
+            return Results.NotFound(new { Message = "User not found." });
+        }
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Message = "Failed to retrieve user's friends links.", Error = ex.Message });
+    }
+}); 
+
 
 
 
