@@ -333,11 +333,24 @@ app.MapDelete("reports/delete/{linkId}", async (ReportRepo reportsRepo, string l
     }
 });
 
+app.MapGet("users/getFriends/{userId}", async (UsersRepo usersRepo, string userId) =>
+{
+    try
+    {
+        var friends = await usersRepo.GetFriendsAsync(userId);
+        return Results.Ok(friends);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Message = "Failed to retrieve friends.", Error = ex.Message });
+    }
+});
+
 app.MapGet("users/getFriendsLinks/{userId}", async (UsersRepo usersRepo, string userId) =>
 {
     try
     {
-        var user = await usersRepo.GetFriendsLinksAsync(userId);
+        var user = await usersRepo.GetAllFriendsLinksAsync(userId);
 
         if (user != null)
         {
@@ -353,8 +366,6 @@ app.MapGet("users/getFriendsLinks/{userId}", async (UsersRepo usersRepo, string 
         return Results.BadRequest(new { Message = "Failed to retrieve user's friends links.", Error = ex.Message });
     }
 }); 
-
-
 
 
 

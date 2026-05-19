@@ -1,19 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Link } from '../types/types';
 
-interface Friend {
-    id: string;
-    name: string;
-    email: string;
-}
+
 
 const FriendsList = () => {
-    const [friends, setFriends] = useState<Friend[]>([
-        { id: '1', name: 'Alice', email: 'alice@example.com' },
-        { id: '2', name: 'Bob', email: 'bob@example.com' },
-        { id: '3', name: 'Charlie', email: 'charlie@example.com' },
-    ]);
+    const [friends, setFriends] = useState<string[]>([]);
 
     const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
 
