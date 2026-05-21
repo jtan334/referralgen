@@ -18,11 +18,11 @@ namespace referralGen.SQLRepo
         }
 
         public async Task<string> CreateNewUser(Users newUser)
-{
-    using var connection = _dbConnection.CreateConnection();
+        {
+            using var connection = _dbConnection.CreateConnection();
 
-    // Insert user and retrieve the user by the last inserted ID
-    string sql = @"
+            // Insert user and retrieve the user by the last inserted ID
+            string sql = @"
         INSERT INTO users (UID, name) 
         VALUES (@UID, @Name);
         
@@ -30,94 +30,94 @@ namespace referralGen.SQLRepo
         FROM users 
         WHERE UID = @UID";  // Assuming 'id' is the primary key
 
-    try
-    {
-        var createNewUser = await connection.QuerySingleOrDefaultAsync<Users>(sql, new 
-        {
-            newUser.UID,
-            newUser.Name
-        });
-
-        if (createNewUser != null)
-        {
-            return $"User created successfully: {createNewUser.UID} - {createNewUser.Name}";
-        }
-        else
-        {
-            return "Error: Failed to retrieve the newly created user.";
-        }
-    }
-    catch (Exception ex)
-    {
-        // Log the exception if needed
-        return $"Error creating new user: {ex.Message}";
-    }
-}
-
-        public async Task<string> DeleteUser (string Uid)
-    {
-        using var connection = _dbConnection.CreateConnection();
-
-        string deleteLinksSql = "DELETE FROM links WHERE Owner = @UID;";
-        await connection.ExecuteAsync(deleteLinksSql, new { UID = Uid });
-
-        var deleteQuery = "DELETE FROM users WHERE UID = @Uid";
-
-        try
-        {
-            var rowsAffected = await connection.ExecuteAsync(deleteQuery, new { UID = Uid });
-
-            if (rowsAffected == 0)
+            try
             {
-                return $"User ID: {Uid} Not Found";
+                var createNewUser = await connection.QuerySingleOrDefaultAsync<Users>(sql, new
+                {
+                    newUser.UID,
+                    newUser.Name
+                });
+
+                if (createNewUser != null)
+                {
+                    return $"User created successfully: {createNewUser.UID} - {createNewUser.Name}";
+                }
+                else
+                {
+                    return "Error: Failed to retrieve the newly created user.";
+                }
             }
-            return $"Successfully deleted user {Uid}";
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("An error occurred while deleting the link.", ex);
-        }
-    }
-
-    public async Task<string> AddFreind (string Uid)
-        {
-            using var connection = _dbConnection.CreateConnection();
-                string addFriendSql = "UPDATE users SET friends = array_append(friends, @Uid) WHERE UID = @Uid";
-                try
-                {
-                    await connection.ExecuteAsync(addFriendSql, new { Uid });
-                    return $"Successfully added friend {Uid}";
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("An error occurred while adding a friend.", ex);
-                }
+            catch (Exception ex)
+            {
+                // Log the exception if needed
+                return $"Error creating new user: {ex.Message}";
+            }
         }
 
-    public async Task<string> RemoveFriend (string Uid)
+        public async Task<string> DeleteUser(string Uid)
         {
             using var connection = _dbConnection.CreateConnection();
-                string removeFriendSql = "UPDATE users SET friends = array_remove(friends, @Uid) WHERE UID = @Uid";
-                try
+
+            string deleteLinksSql = "DELETE FROM links WHERE Owner = @UID;";
+            await connection.ExecuteAsync(deleteLinksSql, new { UID = Uid });
+
+            var deleteQuery = "DELETE FROM users WHERE UID = @Uid";
+
+            try
+            {
+                var rowsAffected = await connection.ExecuteAsync(deleteQuery, new { UID = Uid });
+
+                if (rowsAffected == 0)
                 {
-                    await connection.ExecuteAsync(removeFriendSql, new { Uid });
-                    return $"Successfully removed friend {Uid}";
+                    return $"User ID: {Uid} Not Found";
                 }
-                catch (Exception ex)
-                {
-                    throw new Exception("An error occurred while removing a friend.", ex);
-                }
+                return $"Successfully deleted user {Uid}";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deleting the link.", ex);
+            }
         }
-    public async Task<string[]> GetFriendsAsync(string userID)
-    {
-        using var connection = _dbConnection.CreateConnection();
 
-        string sql = "SELECT friends FROM users WHERE UID = @UserId";
-        var friends = await connection.QuerySingleOrDefaultAsync<string[]>(sql, new { UserId = userID });
+        public async Task<string> AddFreind(string Uid)
+        {
+            using var connection = _dbConnection.CreateConnection();
+            string addFriendSql = "UPDATE users SET friends = array_append(friends, @Uid) WHERE UID = @Uid";
+            try
+            {
+                await connection.ExecuteAsync(addFriendSql, new { Uid });
+                return $"Successfully added friend {Uid}";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while adding a friend.", ex);
+            }
+        }
 
-        return friends ?? Array.Empty<string>();
-    }
-    public async Task<List<Link>> GetAllFriendsLinksAsync(string userID)
+        public async Task<string> RemoveFriend(string Uid)
+        {
+            using var connection = _dbConnection.CreateConnection();
+            string removeFriendSql = "UPDATE users SET friends = array_remove(friends, @Uid) WHERE UID = @Uid";
+            try
+            {
+                await connection.ExecuteAsync(removeFriendSql, new { Uid });
+                return $"Successfully removed friend {Uid}";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while removing a friend.", ex);
+            }
+        }
+        public async Task<string[]> GetFriendsAsync(string userID)
+        {
+            using var connection = _dbConnection.CreateConnection();
+
+            string sql = "SELECT friends FROM users WHERE UID = @UserId";
+            var friends = await connection.QuerySingleOrDefaultAsync<string[]>(sql, new { UserId = userID });
+
+            return friends ?? Array.Empty<string>();
+        }
+        public async Task<List<Link>> GetAllFriendsLinksAsync(string userID)
         {
             using var connection = _dbConnection.CreateConnection();
 
@@ -130,6 +130,16 @@ namespace referralGen.SQLRepo
             var friendsLinks = await connection.QueryAsync<Link>(sql, new { UserId = userID });
 
             return friendsLinks.ToList();
+        }
+
+        public async Task<string> GetNameByUIDAsync(string userID)
+        {
+            using var connection = _dbConnection.CreateConnection();
+
+            string sql = "SELECT name FROM users WHERE UID = @UserId";
+            var name = await connection.QuerySingleOrDefaultAsync<string>(sql, new { UserId = userID });
+
+            return name ?? "Name not found";
         }
     }
 }

@@ -1,5 +1,5 @@
 using Microsoft.OpenApi.Models;
-using referralGen.SQLRepo; 
+using referralGen.SQLRepo;
 using dotenv.net;
 using referralGen.models;
 using referralGen.Models;
@@ -14,10 +14,10 @@ builder.Configuration.AddEnvironmentVariables();
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
 {
-     c.SwaggerDoc("v1", new OpenApiInfo { Title = "referrallGen API", Description = "Generate referral links and share them", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "referrallGen API", Description = "Generate referral links and share them", Version = "v1" });
 });
 
-string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") 
+string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
                           ?? throw new InvalidOperationException("Connection string not found in environment variables.");
 ;
 
@@ -43,23 +43,23 @@ builder.Services.AddCors(options =>
         });
 });
 
-    
+
 var app = builder.Build();
 
 app.UseAuthorization();
 app.MapControllers();
 app.UseCors("AllowAllOrigins");
-    
+
 if (app.Environment.IsDevelopment())
 {
-   app.UseSwagger();
-   app.UseSwaggerUI(c =>
-   {
-      c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReferralGen API V1");
-   });
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReferralGen API V1");
+    });
 }
 
-    
+
 
 app.MapGet("/users/links/{userId}", async (string userId, UsersRepo usersRepo) =>
 {
@@ -79,19 +79,23 @@ app.MapGet("/company/", async (CompanyRepo companyRepo) =>
     return links != null ? Results.Ok(links) : Results.NotFound();
 });
 
-app.MapPost ("/links/new", async (Link link, LinkRepo linkRepo) =>
+app.MapPost("/links/new", async (Link link, LinkRepo linkRepo) =>
 {
     var res = await linkRepo.AddNewLink(link);
 
-    if (res != null){
-         if (res == "The RefLink is not unique") {
+    if (res != null)
+    {
+        if (res == "The RefLink is not unique")
+        {
             return Results.BadRequest(res);
         }
-        else{
+        else
+        {
             return Results.Ok(res);
         }
     }
-    else {
+    else
+    {
         return Results.NotFound(new { Message = "Link creation failed." });
     }
 });
@@ -119,9 +123,9 @@ app.MapPut("/links/edit", async (Link link, LinkRepo linkRepo) =>
     }
 });
 
-app.MapDelete( "/links/delete/{Id}", async(LinkRepo linkRepo, string Id)=>
+app.MapDelete("/links/delete/{Id}", async (LinkRepo linkRepo, string Id) =>
 {
- try
+    try
     {
         var result = await linkRepo.DeleteLink(Id);
         return Results.Ok(result);
@@ -135,56 +139,63 @@ app.MapDelete( "/links/delete/{Id}", async(LinkRepo linkRepo, string Id)=>
 
 });
 
-app.MapPatch ("links/edit/activate", async(LinkRepo linkRepo, string id) =>
+app.MapPatch("links/edit/activate", async (LinkRepo linkRepo, string id) =>
 {
-    try{
+    try
+    {
         var result = await linkRepo.ActivateLink(id);
         return Results.Ok(result);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
         return Results.BadRequest(ex);
     }
 });
 
-app.MapPatch ("links/update/seen", async(LinkRepo linkRepo,string id) =>
+app.MapPatch("links/update/seen", async (LinkRepo linkRepo, string id) =>
 {
-    try{
+    try
+    {
         var result = await linkRepo.AddSeenAsync(id);
         return Results.Ok(result);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
         return Results.BadRequest(ex);
     }
 });
 
-app.MapPatch ("links/update/used", async(LinkRepo linkRepo,string id) =>
+app.MapPatch("links/update/used", async (LinkRepo linkRepo, string id) =>
 {
-    try{
+    try
+    {
         var result = await linkRepo.AddUsedAsync(id);
         return Results.Ok(result);
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
         return Results.BadRequest(ex);
     }
 });
 
 
-app.MapPost ("company/add", async(CompanyRepo companyRepo, Company company)=>
+app.MapPost("company/add", async (CompanyRepo companyRepo, Company company) =>
 {
-       var res = await companyRepo.AddCompany(company);
+    var res = await companyRepo.AddCompany(company);
 
-    if (res != null){
-         if (res == "The company and product name is not unique") {
+    if (res != null)
+    {
+        if (res == "The company and product name is not unique")
+        {
             return Results.BadRequest(res);
         }
-        else{
+        else
+        {
             return Results.Ok(res);
         }
     }
-    else {
+    else
+    {
         return Results.NotFound(new { Message = "Company creation failed." });
     }
 });
@@ -213,29 +224,33 @@ app.MapPatch("/company/{id}/approve", async (CompanyRepo companyRepo, int id) =>
 
 
 
-app.MapPost("users/add", async(UsersRepo usersRepo, Users user)=>
+app.MapPost("users/add", async (UsersRepo usersRepo, Users user) =>
 {
 
-    var res = await usersRepo.CreateNewUser(user); 
+    var res = await usersRepo.CreateNewUser(user);
 
-    if (res != null){
-        
-            return Results.Ok(res);
+    if (res != null)
+    {
+
+        return Results.Ok(res);
     }
-    else {
+    else
+    {
         return Results.BadRequest(new { Message = "User creation failed." });
     }
 });
 
-app.MapDelete("users/delete/{userId}", async(UsersRepo usersRepo, string userId) =>
+app.MapDelete("users/delete/{userId}", async (UsersRepo usersRepo, string userId) =>
 {
     var res = await usersRepo.DeleteUser(userId);
 
-    if (res != null){
-        
-            return Results.Ok(res);
+    if (res != null)
+    {
+
+        return Results.Ok(res);
     }
-    else {
+    else
+    {
         return Results.BadRequest(new { Message = "User deletion failed." });
     }
 });
@@ -365,13 +380,28 @@ app.MapGet("users/getFriendsLinks/{userId}", async (UsersRepo usersRepo, string 
     {
         return Results.BadRequest(new { Message = "Failed to retrieve user's friends links.", Error = ex.Message });
     }
-}); 
+});
+
+app.MapGet("users/getName/{userId}", async (UsersRepo usersRepo, string userId) =>
+{
+    try
+    {
+        var name = await usersRepo.GetNameByUIDAsync(userId);
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            return Results.Ok(new { Name = name });
+        }
+        else
+        {
+            return Results.NotFound(new { Message = "User not found." });
+        }
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Message = "Failed to retrieve user's name.", Error = ex.Message });
+    }
+});
 
 
-
-
-
-
-
-    
 app.Run();

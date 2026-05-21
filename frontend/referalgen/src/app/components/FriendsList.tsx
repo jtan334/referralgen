@@ -21,18 +21,7 @@ const FriendsList = () => {
     return (
         <div>
             <h2>Friends List</h2>
-            <ul>
-                {friends.map(friend => (
-                    <li key={friend.id}>
-                        <input
-                            type="checkbox"
-                            checked={selectedFriends.includes(friend.id)}
-                            onChange={() => toggleFriend(friend.id)}
-                        />
-                        <span>{friend.name} ({friend.email})</span>
-                    </li>
-                ))}
-            </ul>
+
             <p>Selected: {selectedFriends.length} friends</p>
         </div>
     );
