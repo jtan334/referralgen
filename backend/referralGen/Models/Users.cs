@@ -1,4 +1,4 @@
-namespace referralGen.models
+namespace referralGen.Models
 {
 
     public class Users

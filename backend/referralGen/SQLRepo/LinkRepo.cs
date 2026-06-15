@@ -1,4 +1,4 @@
-using referralGen.models;
+using referralGen.Models;
 using Dapper;
 
 namespace referralGen.SQLRepo;

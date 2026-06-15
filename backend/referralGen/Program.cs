@@ -1,7 +1,6 @@
 using Microsoft.OpenApi.Models;
 using referralGen.SQLRepo;
 using dotenv.net;
-using referralGen.models;
 using referralGen.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -402,6 +401,19 @@ app.MapGet("users/getName/{userId}", async (UsersRepo usersRepo, string userId) 
         return Results.BadRequest(new { Message = "Failed to retrieve user's name.", Error = ex.Message });
     }
 });
+
+app.MapPost("users/addFriend", async (UsersRepo usersRepo, string userId, string friendId) =>
+{
+    try
+    {
+        var result = await usersRepo.AddFriend(userId, friendId);
+        return Results.Ok(new { Message = result });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Message = "Failed to add friend.", Error = ex.Message });
+    }
+}); 
 
 
 app.Run();

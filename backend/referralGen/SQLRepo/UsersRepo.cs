@@ -1,5 +1,5 @@
 using Dapper;
-using referralGen.models;
+using referralGen.Models;
 
 namespace referralGen.SQLRepo
 {
@@ -79,14 +79,14 @@ namespace referralGen.SQLRepo
             }
         }
 
-        public async Task<string> AddFreind(string Uid)
+        public async Task<string> AddFriend(string UserId, string FriendId)
         {
             using var connection = _dbConnection.CreateConnection();
-            string addFriendSql = "UPDATE users SET friends = array_append(friends, @Uid) WHERE UID = @Uid";
+            string addFriendSql = "UPDATE users SET friends = array_append(friends, @FriendId) WHERE UID = @UserId";
             try
             {
-                await connection.ExecuteAsync(addFriendSql, new { Uid });
-                return $"Successfully added friend {Uid}";
+                await connection.ExecuteAsync(addFriendSql, new { UserId, FriendId });
+                return $"Successfully added friend {FriendId}";
             }
             catch (Exception ex)
             {
@@ -94,14 +94,14 @@ namespace referralGen.SQLRepo
             }
         }
 
-        public async Task<string> RemoveFriend(string Uid)
+        public async Task<string> RemoveFriend(string UserId, string FriendId)
         {
             using var connection = _dbConnection.CreateConnection();
-            string removeFriendSql = "UPDATE users SET friends = array_remove(friends, @Uid) WHERE UID = @Uid";
+            string removeFriendSql = "UPDATE users SET friends = array_remove(friends, @FriendId) WHERE UID = @UserId";
             try
             {
-                await connection.ExecuteAsync(removeFriendSql, new { Uid });
-                return $"Successfully removed friend {Uid}";
+                await connection.ExecuteAsync(removeFriendSql, new { UserId, FriendId });
+                return $"Successfully removed friend {FriendId}";
             }
             catch (Exception ex)
             {
